@@ -1,0 +1,46 @@
+#!/bin/bash
+
+
+# Load configuration from the config file
+source /script/db/config.cfg
+
+# Check if there are any tables in the database
+table_count=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME'")
+
+# Extract the count from the output
+table_count=$(echo "$table_count" | tail -n 1)
+
+if [ "$table_count" -eq 0 ]; then
+  echo -e "${GREEN}No tables found in the '$DB_NAME' database. Nothing to drop.${NC}"
+  exit 0
+fi
+
+# Prompt for confirmation before dropping tables
+read -p "This script will drop all tables in the '$DB_NAME' database. Do you want to continue? (y/n): " -n 1 -r
+echo
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  # Connect to the MySQL server
+  mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" <<EOF
+    SET FOREIGN_KEY_CHECKS = 0;
+    SET @tables = NULL;
+    SELECT GROUP_CONCAT(table_name) INTO @tables
+    FROM information_schema.tables
+    WHERE table_schema = (SELECT DATABASE());
+    
+    SET @tables = CONCAT('DROP TABLE IF EXISTS ', @tables);
+    PREPARE stmt FROM @tables;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+    SET FOREIGN_KEY_CHECKS = 1;
+EOF
+
+  # Check if the tables were dropped successfully
+  if [ $? -eq 0 ]; then
+    echo -e "${GREEN}All tables in the '$DB_NAME' database have been forcefully dropped.${NC}"
+  else
+    echo -e "${RED}Error: Failed to drop tables in the '$DB_NAME' database.${NC}"
+  fi
+else
+  echo -e "${GREEN}No tables were dropped. Script aborted.${NC}"
+fi

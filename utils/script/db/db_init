@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Load configuration from the config file
+source /script/db/config.cfg
+
+# SQL file containing the queries
+SQL_FILE="../data/template/setupQueries.sql"
+
+# Check if MySQL is installed
+if ! command -v mysql &> /dev/null; then
+    echo -e "${RED}MySQL is not installed. Please install MySQL and try again.${NC}"
+    exit 1
+fi
+
+# Check if the SQL file exists
+if [ ! -f "$SQL_FILE" ]; then
+    echo -e "${RED}Error: SQL file $SQL_FILE not found.${NC}"
+    exit 1
+fi
+
+# Execute the MySQL query and capture the result in a variable
+QUERY_RESULT=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -D "$DB_NAME" < "$SQL_FILE")
+
+# Check if the queries were executed successfully
+# Check if the query was successful
+if [ $? -eq 0 ]; then
+  echo -e "${GREEN}Query executed successfully${NC}"
+  echo -e "${GREEN}${QUERY_RESULT}${NC}"
+else
+  echo -e "Error: Unable to execute the query."
+fi

@@ -1,0 +1,4 @@
+
+[submodule "submodules/blogConfig"]
+	path = submodules/blogConfig
+	url = git@github.com:hikijs/Blog_Config.git

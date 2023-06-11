@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Load configuration from the config file
+source /script/db/config.cfg
+
+# Check if there are any tables in the database
+table_count=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME'")
+
+# Extract the count from the output
+table_count=$(echo "$table_count" | tail -n 1)
+
+if [ "$table_count" -eq 0 ]; then
+  echo -e "${RED}No tables found in the '$DB_NAME' database. Nothing to backup.${NC}"
+  exit 0
+fi
+# Backup directory
+BACKUP_DIR="/data/backup"
+
+# Ensure the backup directory exists
+mkdir -p "$BACKUP_DIR"
+
+# Get a list of all backup files in the directory
+BACKUP_FILES=("$BACKUP_DIR"/*)
+
+# Check the number of backup files
+NUM_BACKUP_FILES=${#BACKUP_FILES[@]}
+
+# If there are 5 or more backup files, remove the oldest one
+if [ "$NUM_BACKUP_FILES" -ge 5 ]; then
+  # Sort the backup files by modification time (oldest first) and remove the oldest
+  oldest_backup_file=$(ls -t "$BACKUP_DIR" | tail -n 1)
+  rm "$BACKUP_DIR/$oldest_backup_file"
+fi
+
+
+# Timestamp (used to create a unique backup file)
+TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+echo $TIMESTAMP
+
+# Create a backup file with a timestamp
+BACKUP_FILE="$BACKUP_DIR/$TIMESTAMP-$DB_NAME.sql"
+
+# Use mysqldump to create the backup, specifying the host
+mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" > "$BACKUP_FILE"
+
+# Check if the backup was successful
+if [ $? -eq 0 ]; then
+  echo -e "${GREEN}Backup completed successfully. Backup file: $BACKUP_FILE ${NC}"
+else
+  echo -e "${RED}Error: Backup failed.${NC}"
+fi

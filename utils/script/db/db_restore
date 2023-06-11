@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Load configuration from the config file
+source /script/db/config.cfg
+
+# Backup directory
+BACKUP_DIR="/data/backup"
+
+# Get a list of all backup files in the directory
+BACKUP_FILES=("$BACKUP_DIR"/*)
+
+# Check if there are any backup files
+if [ ${#BACKUP_FILES[@]} -eq 0 ]; then
+  echo -e "${RED}Error: No backup files found in the backup directory. ${NC}"
+  exit 1
+fi
+
+# Find the most recent backup file
+latest_backup_file=$(ls -t "$BACKUP_DIR" | head -n 1)
+
+# Restore the database from the most recent backup file
+mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" < "$BACKUP_DIR/$latest_backup_file"
+
+# Check if the restore was successful
+if [ $? -eq 0 ]; then
+  echo -e "${GREEN}Restore completed successfully from $latest_backup_file. ${NC}"
+else
+  echo -e "${RED}Error: Restore failed. ${NC}"
+fi

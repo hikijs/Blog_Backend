@@ -1,0 +1,10 @@
+/node_modules
+index.html
+/uploads/*
+/deployment
+/utils/data/backup/*
+!/utils/data/backup/README.md
+/utils/data/backup/*.sql
+.env
+.DS_Store
+/data

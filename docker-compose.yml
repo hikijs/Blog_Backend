@@ -1,0 +1,78 @@
+version: "3.8"
+
+services: 
+    app:
+      image: hunghoang149/blog:v1
+      ports: 
+        - 3000:3000
+      container_name: backend
+      volumes: 
+        - .:/app
+        - '/app/node_modules'
+      depends_on: 
+        - mysql
+      networks:
+        blog_network:
+          aliases:
+          - backend_application
+      command: sh -c "sleep 30 && npm run dev"
+
+    mysql:
+      image: mysql:8.0
+      container_name: mysql
+      environment: 
+        - MYSQL_DATABASE=blog
+        - MYSQL_USER=hunghoang
+        - MYSQL_PASSWORD=123
+        - MYSQL_ROOT_PASSWORD=123
+      ports:
+          - "3306:3306"
+      volumes:
+          - mysqldata:/var/lib/mysql
+      networks:
+        blog_network:
+          aliases:
+          - mysql_db
+
+    phpmyadmin:
+        image: phpmyadmin:5.2.0
+        container_name: phpmyadmin
+        links:
+            - mysql
+        environment:
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+        ports:
+            - 8081:80
+        networks:
+          blog_network:
+            aliases:
+            - phpmyadmin
+    
+    utils:
+        image: hunghoang149/blog_utils:v1
+        container_name: utils
+        volumes:
+          - ./utils/script:/script
+          - ./utils/data:/data
+        depends_on: 
+          - mysql
+        networks:
+          blog_network:
+            aliases:
+            - utils
+
+networks:
+    blog_network:
+        name: blog_network
+        # use the bridge driver
+        driver: bridge
+
+volumes:
+    mysqldata:
+        driver: local
+        driver_opts:
+            type: 'none'
+            o: 'bind'
+            device: './data'
+    
