@@ -80,8 +80,8 @@ class Database
 									connection.connect(function(err) {
 										if (err)
 										{ 
-										console.log(`Connect failed with error ${err}`)
-										reject(err)
+											console.log(`Connect failed with error ${err}`)
+											reject(err)
 										}
 										resolve(connection)
 									});
@@ -181,7 +181,7 @@ class Database
 
  	async singleConnectionQuery(query, params)
 	{
-		if(this.isTxConnection)
+		if(this.txConnection)
 		{
 			return this.sigleTxConnectionQuery(query, params)
 		}
