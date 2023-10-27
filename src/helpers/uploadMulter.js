@@ -3,7 +3,15 @@ const path = require('path');
 const { randomUUID } = require('crypto');
 
 // Determine the root directory of your project
-const rootDirectory = path.dirname(require.main.filename);
+let rootDirectory = ""
+if(process.env.NODE_ENV == 'dev')
+{
+    rootDirectory = path.dirname(require.main.filename);
+}
+else
+{
+    rootDirectory = path.join(path.dirname(require.main.filename), '..','..')
+}
 // configure storage and multer for image and video
 const uploadImageDirectory = path.join(rootDirectory, 'uploads/images');
 const imagesStorage = multer.diskStorage(
