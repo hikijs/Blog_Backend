@@ -1,7 +1,6 @@
 'use strict'
 let mysql = require('mysql2'); // should be using mysql2 for authentication
 const {DB_QUERYs} = require("../configs/configurations")
-require('dotenv').config()
 
 const MYSQL_HOST = process.env.MYSQL_HOST
 const MYSQL_PORT = process.env.MYSQL_PORT
