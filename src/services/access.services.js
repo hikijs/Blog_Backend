@@ -44,6 +44,8 @@ class AccessService
         await TransactionQuery.startTransaction()
         try {
             const newUser = await UserQuery.addUser(username, email, passwordHashed, birth)
+            // the publicKey and private key will has a length 128 in string format
+            // because 1 bytes was represent by 2 heximal => 64 bytes => 128 hex charactes
             const publicKey = crypto.randomBytes(64).toString('hex')
             const privateKey = crypto.randomBytes(64).toString('hex')
             const tokens = await createTokenPair({userId: newUser, email: email},

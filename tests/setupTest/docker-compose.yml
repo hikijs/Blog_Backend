@@ -1,0 +1,76 @@
+version: "3.8"
+
+services: 
+    mysql_test:
+      image: mysql:8.0
+      container_name: mysql_test
+      environment: 
+        - MYSQL_DATABASE=blog
+        - MYSQL_USER=hunghoang
+        - MYSQL_PASSWORD=123
+        - MYSQL_ROOT_PASSWORD=123
+      ports:
+          - "3308:3306"
+      volumes:
+          - mysqltestdata:/var/lib/mysql
+      networks:
+        blog_test_network:
+          aliases:
+          - mysql
+
+    phpmyadmin_test:
+        image: phpmyadmin:5.2.0
+        container_name: phpmyadmin_test
+        links:
+            - mysql_test
+        environment:
+            PMA_HOST: mysql_test
+            PMA_PORT: 3306
+        ports:
+            - 8082:80
+        networks:
+          blog_test_network:
+            aliases:
+            - phpmyadmin
+    
+    utils_test:
+        image: hunghoang149/blog_utils:v1
+        container_name: utils_test
+        volumes:
+          - ../../utils/script:/script
+          - ../../utils/data:/data
+        depends_on: 
+          - mysql_test
+        networks:
+          blog_test_network:
+            aliases:
+            - utils
+    
+    rabbitmq_test:
+        image: "rabbitmq:3.9-management"
+        container_name: rabbitmq_test
+        environment:
+            - RABBITMQ_DEFAULT_USER=hunghoang
+            - RABBITMQ_DEFAULT_PASS=123
+        ports:
+            - "5674:5672"  # AMQP port
+            - "15674:15672"  # RabbitMQ management UI
+        networks:
+            blog_test_network:
+              aliases:
+              - rabbitmq
+
+networks:
+    blog_test_network:
+        name: blog_test_network
+        # use the bridge driver
+        driver: bridge
+
+volumes:
+    mysqltestdata:
+        driver: local
+        driver_opts:
+            type: 'none'
+            o: 'bind'
+            device: './mysqlData'
+    

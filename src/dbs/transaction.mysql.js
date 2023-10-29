@@ -1,4 +1,3 @@
-const instanceMySqlDB = require('./init.mysql');
 const QueryBase = require('./queryBase');
 class TransactionQuery extends QueryBase {
     constructor()
