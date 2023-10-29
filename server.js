@@ -7,13 +7,8 @@ const {initializeWebServer} = require('./src/app')
 async function start() {
         console.time(">>> Start WebServer")
         await initializeDatabase()
-        try {
-          await initializeWebServer();
-          await initializeRabbitMQ(RabbitMq)
-        } catch (error) {
-          releaseDatabaseConnection()
-          throw new Error("Issue happen when start webserver and message mq")
-        }
+        await initializeWebServer();
+        await initializeRabbitMQ(RabbitMq)
         console.timeEnd(">>> Start WebServer")
 }
 
@@ -22,6 +17,7 @@ start()
     console.log('The app has started successfully');
   })
   .catch((error) => {
+    releaseDatabaseConnection()
     console.log('App occured during startup', error);
   });
 
