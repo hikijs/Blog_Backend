@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Default container name
+CONTAINER_NAME="utils"
+
 # Function to display usage information
 display_usage() {
   echo "Usage: $0 [options]"
@@ -9,35 +12,46 @@ display_usage() {
   echo "  -c, --cleanup   Run the database cleanup script"
   echo "  -b, --backup    Run the database backup script"
   echo "  -r, --restore   Run the database restore script"
+  echo "  -t, --test      Use the 'utils_test' container"
 }
 
-# Check if at least one argument is provided
-if [ $# -lt 1 ]; then
-  display_usage
-  exit 1
-fi
-
 # Process command-line options
-case "$1" in
-  --setup | -s)
-    docker exec utils db_manager --setup
-    ;;
-  --cleanup | -c)
-    docker exec -it utils db_manager --cleanup
-    ;;
-  --backup | -b)
-    docker exec utils db_manager --backup
-    ;;
-  --restore | -r)
-    docker exec utils db_manager --restore
-    ;;
-  --help | -h)
-    display_usage
-    exit 0
-    ;;
-  *)
-    echo "Invalid option: $1"
-    display_usage
-    exit 1
-    ;;
-esac
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case "$key" in
+    --setup | -s | --cleanup | -c | --backup | -b | --restore | -r)
+      if [ "$CONTAINER_NAME" == "utils" ]; then
+        if [[ "$*" == *"-t"* ]] || [[ "$*" == *"--test"* ]]; then
+          CONTAINER_NAME="utils_test"
+        fi
+      fi
+      case "$key" in
+        --setup | -s)
+          docker exec "$CONTAINER_NAME" db_manager --setup
+          ;;
+        --cleanup | -c)
+          docker exec -it "$CONTAINER_NAME" db_manager --cleanup
+          ;;
+        --backup | -b)
+          docker exec "$CONTAINER_NAME" db_manager --backup
+          ;;
+        --restore | -r)
+          docker exec "$CONTAINER_NAME" db_manager --restore
+          ;;
+      esac
+      ;;
+    --test | -t)
+      CONTAINER_NAME="utils_test"
+      ;;
+    --help | -h)
+      display_usage
+      exit 0
+      ;;
+    *)
+      echo "Invalid option: $key"
+      display_usage
+      exit 1
+      ;;
+  esac
+  shift
+done
