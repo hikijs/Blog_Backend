@@ -6,5 +6,7 @@ index.html
 !/utils/data/backup/README.md
 /utils/data/backup/*.sql
 .env
+.env.test
 .DS_Store
 /data
+/tests/setupTest/mysqlData
