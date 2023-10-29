@@ -1,7 +1,10 @@
 // document: https://archive.jestjs.io/docs/en/24.x/configuration
 module.exports = {
     verbose: true,
-    bail: 1, // that mean if failed 1 test, it will stop test,
+    bail: 1, // that mean if failed 1 test, it will stop test,\
+    testMatch: [ // the file will be test
+        '**/tests/**/*test*.js'
+    ],
     collectCoverageFrom: [
         /**
          * The ** is a wildcard that matches any number of directories and subdirectories.
@@ -12,6 +15,7 @@ module.exports = {
         "<rootDir>/src/**/*.js",
         "!**/node_modules/**"
     ],
+    notify: false, // it will notify in your machine
     roots : [
         '<rootDir>/tests' // where the jest can find the test
     ],
@@ -22,5 +26,7 @@ module.exports = {
     moduleDirectories :[ // where jest can find the npm module
         '<rootDir>/node_modules'
     ],
-    testEnvironment: "node"
+    testEnvironment: "node",
+    globalSetup: './tests/setupTest/global-setup.js',
+    globalTeardown: './tests/setupTest/global-teardown.js',
 };
