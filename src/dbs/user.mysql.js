@@ -1,4 +1,3 @@
-const instanceMySqlDB = require('./init.mysql');
 const QueryBase = require('./queryBase')
 const SqlBuilder = require('../utils/sqlBuilder')
 class UserQuery extends QueryBase {
