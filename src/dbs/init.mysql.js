@@ -38,7 +38,7 @@ class Database
 
 	releaseAllConnection()
 	{
-		if(this.typeConnection == TYPE_CONNECTION_DB.pool)
+		if(this.typeConnection == TYPE_CONNECTION_DB.pool && this.pool)
 		{
 			this.pool.end()
 		}
