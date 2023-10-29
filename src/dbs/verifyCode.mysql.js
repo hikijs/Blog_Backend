@@ -1,6 +1,4 @@
-const instanceMySqlDB = require('./init.mysql');
 const { v4: uuidv4 } = require('uuid');
-const { VERIFYCODE_TYPE } = require('../configs/configurations');
 const QueryBase = require('./queryBase');
 
 class VerifyCodeQuery extends QueryBase {

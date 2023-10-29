@@ -1,5 +1,6 @@
 'use strict'
 let mysql = require('mysql2'); // should be using mysql2 for authentication
+const util = require('util');
 const {DB_QUERYs} = require("../configs/configurations")
 
 const MYSQL_HOST = process.env.MYSQL_HOST
@@ -15,7 +16,7 @@ const TYPE_CONNECTION_DB = {
 }
 class Database
 {
-    constructor(typeConnection = TYPE_CONNECTION_DB.single)
+    constructor(typeConnection = TYPE_CONNECTION_DB.pool)
     {
 		this.typeConnection = typeConnection
 		// txConnection is flag for handling transaction connection
@@ -35,13 +36,15 @@ class Database
         return Database.instance
     }
 
+
     createPoolConnetion()
     {
         return mysql.createPool({host: MYSQL_HOST || 'mysql',
 								user: MYSQL_USER || 'hunghoang',
 								password: MYSQL_PASSWORD || '123',
 								database: MYSQL_DATABASE || 'blog',
-								connectionLimit: MYSQL_NUMBER_CONNECTS || 10})
+								connectionLimit: MYSQL_NUMBER_CONNECTS || 10,
+								port: MYSQL_PORT || 3306})
     }
 
     createNewConnection()
@@ -49,7 +52,8 @@ class Database
 		return mysql.createConnection({host: MYSQL_HOST || 'mysql',
 										user: MYSQL_USER || 'hunghoang',
 										password: MYSQL_PASSWORD || '123',
-										database: MYSQL_DATABASE || 'blog'});
+										database: MYSQL_DATABASE || 'blog',
+										port: MYSQL_PORT || 3306});
     }
 	// this function supports for transaction query. Because the transaction was processed on an exactly one connection,
 	// so that we need keep this connection till the transaction end
@@ -231,5 +235,4 @@ class Database
 	}
 }
 
-const instanceMySqlDB = Database.getInstance()
-module.exports = instanceMySqlDB
+module.exports = Database

@@ -1,8 +1,8 @@
-const instanceMySqlDB = require('./init.mysql');
+const Database = require('./init.mysql');
 class QueryBase {
     constructor()
     {
-        this.dbInstance = instanceMySqlDB
+        this.dbInstance = Database.getInstance()
     }
 }
 
