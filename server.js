@@ -1,15 +1,22 @@
 const RabbitMq = require("./src/messageQueue/setupRabbitMq")
 require('dotenv').config()
-PORT = process.env.PORT || 3055
 const initializeDatabase = require('./src/dbs/setupDatabase')
 const initializeRabbitMQ = require('./src/messageQueue/setupRabbitMq')
-const initilizeApplication = require('./src/app')
+const {initializeWebServer} = require('./src/app')
 // Using Dependence Injection For DB and Rabbit Mq for easily testing
-initializeDatabase()
+async function start() {
+        console.time(">>> Start WebServer")
+        await initializeDatabase( )
+        await initializeWebServer();
+        await initializeRabbitMQ(RabbitMq)
+        console.timeEnd(">>> Start WebServer")
+}
 
-initializeRabbitMQ(RabbitMq)
+start()
+  .then(() => {
+    console.log('The app has started successfully');
+  })
+  .catch((error) => {
+    console.log('App occured during startup', error);
+  });
 
-const app = initilizeApplication()
-app.listen (PORT, () => {
-        console.log(`Server Blog is listening on PORT ${PORT}`)
-})

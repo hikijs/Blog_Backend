@@ -1,5 +1,3 @@
-const instanceMySqlDB = require('./init.mysql');
-const { post } = require('../routers');
 const { BadRequestError } = require('../core/error.response');
 const QueryBase = require('./queryBase');
 

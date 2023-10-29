@@ -1,4 +1,3 @@
-const instanceMySqlDB = require('./init.mysql');
 const UserQuery = require('./user.mysql')
 const { BadRequestError } = require('../core/error.response');
 const QueryBase = require('./queryBase');
