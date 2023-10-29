@@ -36,6 +36,13 @@ class Database
         return Database.instance
     }
 
+	releaseAllConnection()
+	{
+		if(this.typeConnection == TYPE_CONNECTION_DB.pool)
+		{
+			this.pool.end()
+		}
+	}
 
     createPoolConnetion()
     {
