@@ -22,4 +22,12 @@ const initializeDatabase = async () => {
     console.timeEnd('>>> DB setup');
 };
 
-module.exports = initializeDatabase;
+const releaseDatabaseConnection = async () => {
+    const Database = require("./init.mysql")
+    console.time('>>> release DB connection');
+    const dbInstance = Database.getInstance()
+    dbInstance.releaseAllConnection()
+    console.timeEnd('>>> release DB connection');
+};
+
+module.exports = {initializeDatabase, releaseDatabaseConnection};
