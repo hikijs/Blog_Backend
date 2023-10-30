@@ -1,165 +1,141 @@
-'use strict'
+'use strict';
 let mysql = require('mysql2'); // should be using mysql2 for authentication
-const util = require('util');
-const {DB_QUERYs} = require("../configs/configurations")
-
-const MYSQL_HOST = process.env.MYSQL_HOST
-const MYSQL_PORT = process.env.MYSQL_PORT
-const MYSQL_USER = process.env.MYSQL_USER
-const MYSQL_PASSWORD = process.env.MYSQL_PASSWORD
-const MYSQL_DATABASE = process.env.MYSQL_DATABASE
-const MYSQL_NUMBER_CONNECTS = process.env.MYSQL_NUMBER_CONNECTS
+const {
+	MYSQL_HOST,
+	MYSQL_PORT,
+	MYSQL_USER,
+	MYSQL_PASSWORD,
+	MYSQL_DATABASE,
+	MYSQL_NUMBER_CONNECTS,
+	// eslint-disable-next-line no-undef
+} = process.env;
 
 const TYPE_CONNECTION_DB = {
-	pool: "pool",
-	single: "single"
-}
-class Database
-{
-    constructor(typeConnection = TYPE_CONNECTION_DB.pool)
-    {
-		this.typeConnection = typeConnection
+	pool: 'pool',
+	single: 'single',
+};
+class Database {
+	constructor(typeConnection = TYPE_CONNECTION_DB.pool) {
+		this.typeConnection = typeConnection;
 		// txConnection is flag for handling transaction connection
-		this.txConnection = null
-		if(typeConnection == TYPE_CONNECTION_DB.pool)
-		{
-			this.pool = this.createPoolConnetion()
-		}
-    }
-
-	static getInstance()
-    {
-        if(!Database.instance)
-        {
-            Database.instance = new Database()
-        }
-        return Database.instance
-    }
-
-	releaseAllConnection()
-	{
-		if(this.typeConnection == TYPE_CONNECTION_DB.pool && this.pool)
-		{
-			this.pool.end()
+		this.txConnection = null;
+		if (typeConnection == TYPE_CONNECTION_DB.pool) {
+			this.pool = this.createPoolConnetion();
 		}
 	}
 
-    createPoolConnetion()
-    {
-        return mysql.createPool({host: MYSQL_HOST || 'mysql',
-								user: MYSQL_USER || 'hunghoang',
-								password: MYSQL_PASSWORD || '123',
-								database: MYSQL_DATABASE || 'blog',
-								connectionLimit: MYSQL_NUMBER_CONNECTS || 10,
-								port: MYSQL_PORT || 3306})
-    }
+	static getInstance() {
+		if (!Database.instance) {
+			Database.instance = new Database();
+		}
+		return Database.instance;
+	}
 
-    createNewConnection()
-    {
-		return mysql.createConnection({host: MYSQL_HOST || 'mysql',
-										user: MYSQL_USER || 'hunghoang',
-										password: MYSQL_PASSWORD || '123',
-										database: MYSQL_DATABASE || 'blog',
-										port: MYSQL_PORT || 3306});
-    }
+	releaseAllConnection() {
+		if (this.typeConnection == TYPE_CONNECTION_DB.pool && this.pool) {
+			this.pool.end();
+		}
+	}
+
+	createPoolConnetion() {
+		return mysql.createPool({
+			host: MYSQL_HOST || 'mysql',
+			user: MYSQL_USER || 'hunghoang',
+			password: MYSQL_PASSWORD || '123',
+			database: MYSQL_DATABASE || 'blog',
+			connectionLimit: MYSQL_NUMBER_CONNECTS || 10,
+			port: MYSQL_PORT || 3306,
+		});
+	}
+
+	createNewConnection() {
+		return mysql.createConnection({
+			host: MYSQL_HOST || 'mysql',
+			user: MYSQL_USER || 'hunghoang',
+			password: MYSQL_PASSWORD || '123',
+			database: MYSQL_DATABASE || 'blog',
+			port: MYSQL_PORT || 3306,
+		});
+	}
 	// this function supports for transaction query. Because the transaction was processed on an exactly one connection,
 	// so that we need keep this connection till the transaction end
-	async createTransactionConnection()
-	{
-		var getTxConnPromise = null
-		if(this.typeConnection == TYPE_CONNECTION_DB.pool)
-		{
-			getTxConnPromise = new Promise((resolve, reject) =>
-								{
-									this.pool.getConnection((err, connection) => {
-										if(err)
-										{
-											console.log("Error when get new connection from pool")
-											reject(err)
-										}
-										console.log("DEBUG log transaction Connection")
-										resolve(connection)
-									});
-								})
+	async createTransactionConnection() {
+		var getTxConnPromise = null;
+		if (this.typeConnection == TYPE_CONNECTION_DB.pool) {
+			getTxConnPromise = new Promise((resolve, reject) => {
+				this.pool.getConnection((err, connection) => {
+					if (err) {
+						console.log('Error when get new connection from pool');
+						reject(err);
+					}
+					console.log('DEBUG log transaction Connection');
+					resolve(connection);
+				});
+			});
+		} else if (this.typeConnection == TYPE_CONNECTION_DB.single) {
+			getTxConnPromise = new Promise((resolve, reject) => {
+				const connection = this.createNewConnection();
+				connection.connect(function (err) {
+					if (err) {
+						console.log(`Connect failed with error ${err}`);
+						reject(err);
+					}
+					resolve(connection);
+				});
+			});
 		}
-		else if(this.typeConnection == TYPE_CONNECTION_DB.single)
-		{
-			getTxConnPromise = new Promise((resolve, reject) =>
-								{
-									const connection = this.createNewConnection()
-									connection.connect(function(err) {
-										if (err)
-										{ 
-											console.log(`Connect failed with error ${err}`)
-											reject(err)
-										}
-										resolve(connection)
-									});
-								})
-		}
-		try
-		{
-			this.txConnection = await getTxConnPromise
-		}
-		catch (error) {
-			throw new Error("Issue when getting transaction connection to db")
+		try {
+			this.txConnection = await getTxConnPromise;
+		} catch (error) {
+			throw new Error('Issue when getting transaction connection to db');
 		}
 	}
 
 	// when rollback or commit, we should reset transaction connection
-	removeTxConnection()
-	{
-		if(this.txConnection)
-		{
-			if(this.typeConnection == TYPE_CONNECTION_DB.single)
-			{
-				this.txConnection.end()
+	removeTxConnection() {
+		if (this.txConnection) {
+			if (this.typeConnection == TYPE_CONNECTION_DB.single) {
+				this.txConnection.end();
 			}
-			this.txConnection = null
+			this.txConnection = null;
 		}
 	}
 
-	setTypeConnection(typeConnection)
-	{
-		if(typeConnection !== TYPE_CONNECTION_DB.pool || typeConnection !== TYPE_CONNECTION_DB.single)
-		{
-			console.log(`Set new types ${typeConnection} does not successfully`)
+	setTypeConnection(typeConnection) {
+		if (
+			typeConnection !== TYPE_CONNECTION_DB.pool ||
+			typeConnection !== TYPE_CONNECTION_DB.single
+		) {
+			console.log(
+				`Set new types ${typeConnection} does not successfully`
+			);
 			return;
 		}
-		console.log(`Change connection to DB to new types ${typeConnection} successfully`)
-		this.typeConnection = typeConnection
+		console.log(
+			`Change connection to DB to new types ${typeConnection} successfully`
+		);
+		this.typeConnection = typeConnection;
 	}
 
-
-
-    hitQuery(query, params)
-    {
-		if(this.typeConnection == TYPE_CONNECTION_DB.pool)
-		{
-			return this.poolQuery(query, params)
+	hitQuery(query, params) {
+		if (this.typeConnection == TYPE_CONNECTION_DB.pool) {
+			return this.poolQuery(query, params);
+		} else if (this.typeConnection == TYPE_CONNECTION_DB.single) {
+			return this.singleConnectionQuery(query, params);
 		}
-		else if(this.typeConnection == TYPE_CONNECTION_DB.single)
-		{
-			return this.singleConnectionQuery(query, params)
-		}
-    }
-    
-    poolQuery(query, params) {
-		if(this.txConnection)
-		{
-			return this.poolTxQuery(query, params)
-		}
-		else
-		{
-			return this.poolNormalQuery(query, params)
-		}	
-    }
+	}
 
-	poolTxQuery(query, params)
-	{
-		if(!this.txConnection)
-		{
-			throw new Error("transaction connection does not exist")
+	poolQuery(query, params) {
+		if (this.txConnection) {
+			return this.poolTxQuery(query, params);
+		} else {
+			return this.poolNormalQuery(query, params);
+		}
+	}
+
+	poolTxQuery(query, params) {
+		if (!this.txConnection) {
+			throw new Error('transaction connection does not exist');
 		}
 		return new Promise((resolve, reject) => {
 			this.txConnection.query(query, params, (error, results) => {
@@ -172,11 +148,9 @@ class Database
 		});
 	}
 
-	poolNormalQuery(query, params)
-	{
-		if(!this.pool)
-		{
-			throw new Error("The pool connection does not exist")
+	poolNormalQuery(query, params) {
+		if (!this.pool) {
+			throw new Error('The pool connection does not exist');
 		}
 		return new Promise((resolve, reject) => {
 			this.pool.execute(query, params, (error, results) => {
@@ -189,32 +163,25 @@ class Database
 		});
 	}
 
- 	async singleConnectionQuery(query, params)
-	{
-		if(this.txConnection)
-		{
-			return this.sigleTxConnectionQuery(query, params)
-		}
-		else
-		{
-			return this.singleConnectionNormalQuery(query, params)
+	async singleConnectionQuery(query, params) {
+		if (this.txConnection) {
+			return this.sigleTxConnectionQuery(query, params);
+		} else {
+			return this.singleConnectionNormalQuery(query, params);
 		}
 	}
 
-	singleConnectionNormalQuery(query, params)
-	{
-		const connection = this.createNewConnection()
-		connection.connect((err)  => {
-			if (err)
-			{ 
-				console.log(`Connect failed with error ${err}`)
+	singleConnectionNormalQuery(query, params) {
+		const connection = this.createNewConnection();
+		connection.connect((err) => {
+			if (err) {
+				console.log(`Connect failed with error ${err}`);
 				return null;
 			}
-			});
-		return new Promise((resolve, reject) =>
-		{
+		});
+		return new Promise((resolve, reject) => {
 			connection.query(query, params, (error, results) => {
-				connection.end()
+				connection.end();
 				if (error) {
 					reject(error);
 				} else {
@@ -224,12 +191,10 @@ class Database
 		});
 	}
 
-	sigleTxConnectionQuery(query, params)
-	{
-		if(!this.txConnection)
-		{
-			throw new Error("transaction connection does not exist")
-		}	
+	sigleTxConnectionQuery(query, params) {
+		if (!this.txConnection) {
+			throw new Error('transaction connection does not exist');
+		}
 		return new Promise((resolve, reject) => {
 			this.txConnection.query(query, params, (error, results) => {
 				if (error) {
@@ -242,4 +207,4 @@ class Database
 	}
 }
 
-module.exports = Database
+module.exports = Database;
