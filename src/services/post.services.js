@@ -24,19 +24,26 @@ function getFirst100Words(text) {
 class PostService {
 	static async updatePostStatus(newStatusEdit, postId) {
 		if (!postId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		const postExist = await PostQuery.getPostByPostId(postId);
 		if (postExist == null || postExist.statusEdit === newStatusEdit) {
 			throw new BadRequestError(
-				'Post did not exist or has been matched status'
-			);
+				{
+					message: 'Post did not exist or has been matched status'
+				});
 		}
 		// update post-status
 		try {
 			await PostQuery.updatePostStatus(newStatusEdit, postId);
 		} catch (error) {
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 	}
 	static publishPost = async (req) => {
@@ -56,16 +63,25 @@ class PostService {
 			!postSummarize ||
 			!postCategory
 		) {
-			throw new BadRequestError('Not Enough Headers');
+			throw new BadRequestError(
+				{
+					message: 'Not Enough Headers'
+				});
 		}
 
 		if (postStatus !== 'publish') {
-			throw new BadRequestError('Post status should be Publish');
+			throw new BadRequestError(
+				{
+					message: 'Post status should be Publish'
+				});
 		}
 
 		const categoryData = await PostQuery.getCategory(postCategory);
 		if (categoryData == null) {
-			throw new BadRequestError('Category name is invalid');
+			throw new BadRequestError(
+				{
+					message:'Category name is invalid'
+				});
 		}
 		const postIdNew = await PostQuery.insertPostToDb(
 			postTitle,
@@ -77,7 +93,10 @@ class PostService {
 			categoryData.categroryId
 		);
 		if (postIdNew == null) {
-			throw new BadRequestError('Can Not Create New Post');
+			throw new BadRequestError(
+				{
+					message:'Can Not Create New Post'
+				});
 		}
 		return { newPostId: postIdNew };
 	};
@@ -105,20 +124,32 @@ class PostService {
 			!postSummarize ||
 			!postCategory
 		) {
-			throw new BadRequestError('Not Enough Headers');
+			throw new BadRequestError(
+				{
+					message: 'Not Enough Headers'
+				});
 		}
 		const { filename } = req.file;
 		if (!filename) {
-			throw new BadRequestError('Please adding thumbnail for this post');
+			throw new BadRequestError(
+				{
+					message: 'Please adding thumbnail for this post'
+				});
 		}
 
 		if (postStatus !== 'publish') {
-			throw new BadRequestError('Post status should be Publish');
+			throw new BadRequestError(
+				{
+					message: 'Post status should be Publish'
+				});
 		}
 
 		const categoryData = await PostQuery.getCategory(postCategory);
 		if (categoryData == null) {
-			throw new BadRequestError('Category name is invalid');
+			throw new BadRequestError(
+				{
+					message: 'Category name is invalid'
+				});
 		}
 		await TransactionQuery.startTransaction();
 		try {
@@ -148,8 +179,9 @@ class PostService {
 			await TransactionQuery.rollBackTransaction();
 			console.log(error);
 			throw new BadRequestError(
-				'Error: Issue when create new post with thumbnail'
-			);
+				{
+					message: 'Issue when create new post with thumbnail'
+				});
 		}
 	};
 
@@ -175,29 +207,42 @@ class PostService {
 		const postId = req.params.postId;
 		const userId = req.cookies.userId;
 		if (!postId || !userId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		if (await PostQuery.isUserCanReadPost(userId, postId)) {
 			const postData = await PostQuery.getPostByPostId(postId);
 			if (postData == null) {
-				throw new BadRequestError('Your post request does not exist');
+				throw new BadRequestError(
+					{
+						message: 'Your post request does not exist'
+					});
 			}
 			return { metaData: postData };
 		} else {
 			throw new BadRequestError(
-				'You do not permission to view this post'
-			);
+				{
+					message: 'You do not permission to view this post'
+				});
 		}
 	};
 
 	static editPost = async (req) => {
 		const postId = req.params.postId;
 		if (!postId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		const postData = await PostQuery.getPostByPostId(postId);
 		if (postData == null) {
-			throw new BadRequestError(`post with id ${postId} did not exist`);
+			throw new BadRequestError(
+				{
+					message: `post with id ${postId} did not exist`
+				});
 		}
 		const { title, statusEdit, sharePermission, categroryName } = req.query;
 		const { postContent } = req.body;
@@ -205,7 +250,10 @@ class PostService {
 		if (categroryName) {
 			const existingCategory = await PostQuery.getCategory(categroryName);
 			if (existingCategory == null) {
-				throw new BadRequestError('The category does not exist');
+				throw new BadRequestError(
+					{
+						message: 'The category does not exist'
+					});
 			} else {
 				categroryId = existingCategory.categroryId;
 			}
@@ -224,7 +272,10 @@ class PostService {
 		try {
 			await PostQuery.updatePost(queriesData, postId, categroryId);
 		} catch (error) {
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 		return { metaData: {} };
 	};
@@ -232,16 +283,25 @@ class PostService {
 	static deletePost = async (req) => {
 		const postId = req.params.postId;
 		if (!postId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		const postData = await PostQuery.getPostByPostId(postId);
 		if (postData == null) {
-			throw new BadRequestError(`post with id ${postId} did not exist`);
+			throw new BadRequestError(
+				{
+					message: `post with id ${postId} did not exist`
+				});
 		}
 		try {
 			await PostQuery.deletePost(postId);
 		} catch (error) {
-			throw new BadRequestError('Can not delete Post');
+			throw new BadRequestError(
+				{
+					message: 'Can not delete Post'
+				});
 		}
 		return { metaData: `Delete Post ${postId} Success` };
 	};
@@ -249,16 +309,25 @@ class PostService {
 	static deleteAllPost = async (req) => {
 		const ans = req.query.ans;
 		if (!ans || ans != 'true') {
-			throw new BadRequestError('All your posts did not remove');
+			throw new BadRequestError(
+				{
+					message: 'All your posts did not remove'
+				});
 		}
 		const userId = req.cookies.userId;
 		if (!userId) {
-			throw new BadRequestError('Your are not have an authorization');
+			throw new BadRequestError(
+				{
+					message: 'Your are not have an authorization'
+				});
 		}
 		try {
 			await PostQuery.deletePostByUser(userId);
 		} catch (error) {
-			throw new BadRequestError('Can not delete Post');
+			throw new BadRequestError(
+				{
+					message: 'Can not delete Post'
+				});
 		}
 		return { metaData: `Delete all for user ${userId} Success` };
 	};
@@ -271,20 +340,27 @@ class PostService {
 		const comment = req.body.comment;
 		const userId = req.cookies.userId;
 		if (!postId || !comment || !userId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 
 		if (parentCommentId) {
 			const parentData = await PostQuery.getCommentById(parentCommentId);
 			if (parentData == null) {
 				throw new BadRequestError(
-					`parent comment with id ${parentCommentId} did not exist`
-				);
+					{
+						message: `parent comment with id ${parentCommentId} did not exist`
+					});
 			}
 		}
 		const postData = await PostQuery.getPostByPostId(postId);
 		if (postData == null) {
-			throw new BadRequestError(`post with id ${postId} did not exist`);
+			throw new BadRequestError(
+				{
+					message: `post with id ${postId} did not exist`
+				});
 		}
 		try {
 			await PostQuery.upSertCommentForPost(
@@ -295,7 +371,10 @@ class PostService {
 				commentId
 			);
 		} catch (error) {
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 		return { metaData: {} };
 	};
@@ -305,18 +384,25 @@ class PostService {
 		const userId = req.cookies.userId;
 		console.log(commentId);
 		if (!commentId || !userId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		const commentData = await PostQuery.getCommentById(commentId, userId);
 		if (commentData == null) {
 			throw new BadRequestError(
-				`comment with id ${commentId} did not exist`
-			);
+				{
+					message: `comment with id ${commentId} did not exist`
+				});
 		}
 		try {
 			await PostQuery.deleteComment(commentId, userId);
 		} catch (error) {
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 		return { metaData: {} };
 	};
@@ -326,7 +412,10 @@ class PostService {
 		const userId = req.cookies.userId;
 		const parentCommentId = req.query.parentCommentId;
 		if (!postId || !userId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		if (parentCommentId) {
 			return await PostQuery.getCommentByParentId(parentCommentId);
@@ -339,7 +428,10 @@ class PostService {
 		const postId = req.params.postId;
 		const userId = req.cookies.userId;
 		if (!postId || !userId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		await PostQuery.getCommentByPostId(postId, false);
 	};
@@ -349,16 +441,25 @@ class PostService {
 		const userId = req.cookies.userId;
 		console.log(userId);
 		if (!userId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		const postData = await PostQuery.getPostByPostId(postId);
 		if (postData == null) {
-			throw new BadRequestError(`post with id ${postId} did not exist`);
+			throw new BadRequestError(
+				{
+					message: `post with id ${postId} did not exist`
+				});
 		}
 		try {
 			await PostQuery.upSertLikeForPost(postId, userId);
 		} catch (error) {
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 		return { metaData: {} };
 	};
@@ -366,7 +467,10 @@ class PostService {
 	static getMyPosts = async (req) => {
 		const userId = req.cookies.userId;
 		if (!userId) {
-			throw new AuthFailureError('Not Enough Info');
+			throw new AuthFailureError(
+				{
+					message: 'Not Enough Info'
+				});
 		}
 		const numberPosts = await PostQuery.getNumberPostOfUser(userId);
 		const listPost = await PostQuery.getPostByUserId(userId, numberPosts);
@@ -379,7 +483,10 @@ class PostService {
 	static getAllPost = async (req) => {
 		const userId = req.cookies.userId;
 		if (!userId) {
-			throw new AuthFailureError('Not Enough Info');
+			throw new AuthFailureError(
+				{
+					message: 'Not Enough Info'
+				});
 		}
 		const numberPosts = await PostQuery.getNumberPostFollowedByUser(userId);
 		const listPost = await PostQuery.getPostByUserIdV2(userId, numberPosts);
@@ -394,11 +501,15 @@ class PostService {
 		const userId = req.cookies.userId;
 		if (!userId) {
 			throw new BadRequestError(
-				'Issue related to miss authentication info'
-			);
+				{
+					message: 'Issue related to miss authentication info'
+				});
 		}
 		if (!postId || !nameList) {
-			throw new BadRequestError('Please give postId nameList');
+			throw new BadRequestError(
+				{
+					message: 'Please give postId nameList'
+				});
 		}
 		const savePostQuery = new SavePostQuery();
 		return await savePostQuery.saveNewPost(userId, nameList, postId);
@@ -409,11 +520,15 @@ class PostService {
 		const userId = req.cookies.userId;
 		if (!userId) {
 			throw new BadRequestError(
-				'Issue related to miss authentication info'
-			);
+				{
+					message: 'Issue related to miss authentication info'
+				});
 		}
 		if (!postId) {
-			throw new BadRequestError('Please give postId');
+			throw new BadRequestError(
+				{
+					message: 'Please give postId'
+				});
 		}
 		const savePostQuery = new SavePostQuery();
 		return await savePostQuery.unsavePost(userId, saveListId, postId);
@@ -424,11 +539,15 @@ class PostService {
 		const userId = req.cookies.userId;
 		if (!userId) {
 			throw new BadRequestError(
-				'Issue related to miss authentication info'
-			);
+				{
+					message: 'Issue related to miss authentication info'
+				});
 		}
 		if (!saveListId) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give postId'
+				});
 		}
 		const savePostQuery = new SavePostQuery();
 		return await savePostQuery.getSavedPost(saveListId, userId);
@@ -438,8 +557,9 @@ class PostService {
 		const userId = req.cookies.userId;
 		if (!userId) {
 			throw new BadRequestError(
-				'Issue related to miss authentication info'
-			);
+				{
+					message: 'Issue related to miss authentication info'
+				});
 		}
 		const savePostQuery = new SavePostQuery();
 		return await savePostQuery.getSavedListByUserId(userId);
@@ -450,11 +570,15 @@ class PostService {
 		const userId = req.cookies.userId;
 		if (!userId) {
 			throw new BadRequestError(
-				'Issue related to miss authentication info'
-			);
+				{
+					message: 'Issue related to miss authentication info'
+				});
 		}
 		if (!saveListId) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give more information'
+				});
 		}
 		const savePostQuery = new SavePostQuery();
 		return await savePostQuery.deleteSavePostById(saveListId, userId);
