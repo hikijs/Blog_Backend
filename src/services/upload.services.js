@@ -10,15 +10,21 @@ class UploadService {
 		let { topic, postId } = req.query;
 		if (!userId) {
 			throw new AuthFailureError(
-				'Please verify your authentication',
-				401
-			);
+				{
+					message: 'Please verify your authentication'
+				});
 		}
 		if (!AVATAR_TOPIC.includes(topic)) {
-			throw new BadRequestError('Please give correct topic', 400);
+			throw new BadRequestError(
+				{
+					message: 'Please give correct topic'
+				});
 		} else if (topic == 'thumnail' && !postId) {
 			{
-				throw new BadRequestError('Please give infor of post', 400);
+				throw new BadRequestError(
+					{
+						message: 'Please give infor of post'
+					});
 			}
 		}
 		const { filename } = req.file;

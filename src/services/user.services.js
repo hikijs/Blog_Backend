@@ -28,7 +28,10 @@ class UserService {
 		const currentUserId = req.cookies.userId;
 		const userId = req.params.userId;
 		if (!userId || !currentUserId) {
-			throw new BadRequestError('Please give more infor');
+			throw new BadRequestError(
+				{
+					message: 'Please give more infor'
+				});
 		}
 		try {
 			const userExists = await UserQuery.checkUserExistById(userId);
@@ -39,7 +42,10 @@ class UserService {
 				);
 				return userData;
 			} else {
-				throw new BadRequestError('User does not exist');
+				throw new BadRequestError(
+					{
+						message: 'User does not exist'
+					});
 			}
 		} catch (error) {
 			throw new Error(`Get Profile failed with reason ${error}`);
@@ -81,10 +87,16 @@ class UserService {
 		const userId = req.cookies.userId;
 		const userData = await UserQuery.getUserById(userId);
 		if (!userData) {
-			throw new BadRequestError('The user does not exist');
+			throw new BadRequestError(
+				{
+					message: 'The user does not exist'
+				});
 		}
 		if (userData.verified) {
-			throw new BadRequestError('The user has been verified');
+			throw new BadRequestError(
+				{
+					message: 'The user has been verified'
+				});
 		}
 		try {
 			const code = generateVerificationCode();
@@ -111,7 +123,10 @@ class UserService {
 		const userId = req.cookies.userId;
 		const verifyCode = req.params.verifyCode;
 		if (!verifyCode || !userId) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give more information'
+				});
 		}
 		const existingCode = await VerifyCodeQuery.checkCodeExistOrNot(
 			verifyCode,
@@ -119,7 +134,10 @@ class UserService {
 			VERIFYCODE_TYPE.VERIFY_EMAIL
 		);
 		if (existingCode == null) {
-			throw new BadRequestError('Incorrect Code Please Fill Again');
+			throw new BadRequestError(
+				{
+					message: 'Incorrect Code Please Fill Again'
+				});
 		}
 		try {
 			await UserQuery.updateVerifiedStatus(true, userId);
@@ -130,8 +148,10 @@ class UserService {
 			);
 		} catch (error) {
 			throw new BadRequestError(
-				`Update status verified of user is not successful with reason ${error}`
-			);
+				{
+					message: `Update status verified of user 
+							is not successful with reason ${error}`
+				});
 		}
 
 		return {};
@@ -141,7 +161,10 @@ class UserService {
 		const recipientId = req.cookies.userId;
 		const status = req.query.status;
 		if (!recipientId) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give more information'
+				});
 		}
 		if (
 			status &&
@@ -150,8 +173,10 @@ class UserService {
 			status != 'Pending'
 		) {
 			throw new BadRequestError(
-				'The status does not expectation, should be (Accepted ,Rejected or Pending)'
-			);
+				{
+					message: 'The status does not expectation, should be \
+							  (Accepted ,Rejected or Pending)'
+				});
 		}
 
 		try {
@@ -161,7 +186,10 @@ class UserService {
 			);
 			return { listRequests: listRequests };
 		} catch (error) {
-			throw new BadRequestError('Something went wrong when getting data');
+			throw new BadRequestError(
+				{
+					message: 'Something went wrong when getting data'
+				});
 		}
 	};
 
@@ -170,10 +198,16 @@ class UserService {
 		const recipientId = req.params.friendId;
 
 		if (!requesterId || !recipientId) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give more information'
+				});
 		}
 		if (requesterId === recipientId) {
-			throw new BadRequestError('Please double check your input');
+			throw new BadRequestError(
+				{
+					message: 'Please double check your input'
+				});
 		}
 		await TransactionQuery.startTransaction();
 		try {
@@ -193,7 +227,10 @@ class UserService {
 			await TransactionQuery.commitTransaction();
 		} catch (error) {
 			await TransactionQuery.rollBackTransaction();
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 		return {};
 	};
@@ -202,10 +239,16 @@ class UserService {
 		const requesterId = req.cookies.userId;
 		const recipientId = req.params.friendId;
 		if (requesterId === recipientId) {
-			throw new BadRequestError('Please double check your input');
+			throw new BadRequestError(
+				{
+					message: 'Please double check your input'
+				});
 		}
 		if (!requesterId || !recipientId) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give more information'
+				});
 		}
 		await TransactionQuery.startTransaction();
 		try {
@@ -213,7 +256,10 @@ class UserService {
 			await TransactionQuery.commitTransaction();
 		} catch (error) {
 			await TransactionQuery.rollBackTransaction();
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 		return {};
 	};
@@ -223,7 +269,10 @@ class UserService {
 		const requesterId = req.params.requesterId;
 		const status = req.query.ans;
 		if (requesterId === recipientId) {
-			throw new BadRequestError('Please double check your input');
+			throw new BadRequestError(
+				{
+					message: 'Please double check your input'
+				});
 		}
 		const friendlyExistence = await FriendQuery.checkIfTheyAreFriend(
 			requesterId,
@@ -231,11 +280,15 @@ class UserService {
 		);
 		if (friendlyExistence) {
 			throw new BadRequestError(
-				'You and this user is the friend right now'
-			);
+				{
+					message: 'You and this user is the friend right now'
+				});
 		}
 		if (!requesterId || !recipientId || !status) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give more information'
+				});
 		}
 		// should be answered for pending request, that mean each request only was answered one time
 		const friendRequestExist = await FriendQuery.isFriendRequestExist(
@@ -245,8 +298,10 @@ class UserService {
 		);
 		if (!friendRequestExist) {
 			throw new BadRequestError(
-				'No friend request with status is pending exist, maybe you have answered before'
-			);
+				{
+					message: 'No friend request with status is pending exist, \
+							 maybe you have answered before'
+				});
 		}
 		// update friend request and frienship
 		await TransactionQuery.startTransaction();
@@ -273,7 +328,10 @@ class UserService {
 			await TransactionQuery.commitTransaction();
 		} catch (error) {
 			await TransactionQuery.rollBackTransaction();
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 		return {};
 	};
@@ -281,13 +339,19 @@ class UserService {
 	static getMyFriends = async (req) => {
 		const userId = req.cookies.userId;
 		if (!userId) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give more information'
+				});
 		}
 		try {
 			const listFriends = await FriendQuery.getFriendOfUser(userId);
 			return { listFriends: listFriends };
 		} catch (error) {
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 	};
 
@@ -296,7 +360,10 @@ class UserService {
 		const limit = req.query.limit || 3;
 		let page = Number(req.query.page) || 1;
 		if (!userId) {
-			throw new BadRequestError('Please give more information');
+			throw new BadRequestError(
+				{
+					message: 'Please give more information'
+				});
 		}
 		try {
 			const totalRecommend = await FriendQuery.getTotalNotFriend(userId);
@@ -332,7 +399,10 @@ class UserService {
 				RecommendFollowList: listNotFriendWithUser,
 			};
 		} catch (error) {
-			throw new BadRequestError(error);
+			throw new BadRequestError(
+				{
+					message: error
+				});
 		}
 	};
 
@@ -354,7 +424,10 @@ class UserService {
 			const data = await putApi(url);
 			return { data };
 		} catch (error) {
-			throw new BadRequestError('Issue in notify service');
+			throw new BadRequestError(
+				{
+					message: 'Issue in notify service'
+				});
 		}
 	};
 
@@ -367,7 +440,10 @@ class UserService {
 			const data = await putApi(url);
 			return { data };
 		} catch (error) {
-			throw new BadRequestError('Issue in notify service');
+			throw new BadRequestError(
+				{
+					message: 'Issue in notify service'
+				});
 		}
 	};
 }

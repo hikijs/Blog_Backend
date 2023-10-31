@@ -21,7 +21,9 @@ class FriendQuery extends QueryBase {
 			}
 		} catch (error) {
 			throw new BadRequestError(
-				'Some thing went wrong when making friend request'
+				{
+					message: 'Some thing went wrong when making friend request'
+				}
 			);
 		}
 	}
@@ -41,7 +43,10 @@ class FriendQuery extends QueryBase {
 			]);
 		} else {
 			throw new BadRequestError(
-				'The status does not expectation, should be (Accepted ,Rejected or Pending)'
+				{
+					message: 'The status does not expectation, \
+					          should be (Accepted ,Rejected or Pending)'
+				}
 			);
 		}
 	}
@@ -70,7 +75,9 @@ class FriendQuery extends QueryBase {
 			return listFriendRequest;
 		} catch (error) {
 			throw new BadRequestError(
-				'Some thing went wrong when making friend request'
+				{
+					message: 'Some thing went wrong when making friend request'
+				}
 			);
 		}
 	}
@@ -83,7 +90,9 @@ class FriendQuery extends QueryBase {
 
 		if (!isRequesterExist || !isRecipientExist) {
 			throw new BadRequestError(
-				'There are some wrong related the existance of user'
+				{
+					message: 'There are some wrong related the existance of user'
+				}
 			);
 		}
 
@@ -93,7 +102,9 @@ class FriendQuery extends QueryBase {
 		);
 		if (friendshipExistence) {
 			throw new BadRequestError(
-				'You and this user is the friend right now'
+				{
+					message: 'You and this user is the friend right now'
+				}
 			);
 		}
 
@@ -108,7 +119,9 @@ class FriendQuery extends QueryBase {
 			);
 			if (previousAnswereRequest == 'Pending') {
 				throw new BadRequestError(
-					'Your request are waiting for answere'
+					{
+						message: 'Your request are waiting for answere'
+					}
 				);
 			}
 			console.log('UPDATE existing friend request');
@@ -148,7 +161,9 @@ class FriendQuery extends QueryBase {
 		);
 		if (friendlyExistence) {
 			throw new BadRequestError(
-				'You and this user is the friend right now'
+				{
+					message: 'You and this user is the friend right now'
+				}
 			);
 		}
 
@@ -183,7 +198,9 @@ class FriendQuery extends QueryBase {
 		);
 		if (!friendlyExistence) {
 			throw new BadRequestError(
-				'You and this user does not a friend right now'
+				{
+					message: 'You and this user does not a friend right now'
+				}
 			);
 		}
 		const deleteQuery = `DELETE FROM FRIENDSHIPS
@@ -196,7 +213,10 @@ class FriendQuery extends QueryBase {
 			userAId,
 		]);
 		if (result.affectedRows != 2) {
-			throw new BadRequestError('Some thing wrong when delete data');
+			throw new BadRequestError(
+				{
+					message:'Some thing wrong when delete data'
+				});
 		}
 	}
 
