@@ -1,7 +1,10 @@
 const RabbitMq = require('../../src/messageQueue/setupRabbitMq');
-const { initializeDatabase } = require('../../src/dbs/setupDatabase');
+const {
+	initializeDatabase,
+	releaseDatabaseConnection,
+} = require('../../src/dbs/setupDatabase');
 const initializeRabbitMQ = require('../../src/messageQueue/setupRabbitMq');
-const { initializeWebServer } = require('../../src/app');
+const { initializeWebServer, stopWebServer } = require('../../src/app');
 // Using Dependence Injection For DB and Rabbit Mq for easily testing
 async function serverStart() {
 	await initializeDatabase();
@@ -10,4 +13,9 @@ async function serverStart() {
 	return connection;
 }
 
-module.exports = serverStart;
+async function serverStop() {
+	await releaseDatabaseConnection();
+	await stopWebServer();
+}
+
+module.exports = { serverStart, serverStop };

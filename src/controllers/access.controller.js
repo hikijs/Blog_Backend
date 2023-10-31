@@ -1,5 +1,9 @@
 'use strict';
-const { OK, CREATED, REDIRECT } = require('../core/success.response');
+const {
+	OK,
+	CREATED,
+	REDIRECT,
+} = require('../core/response/apiSuccessResponse');
 
 const AccessService = require('../services/access.services');
 class AccessController {
