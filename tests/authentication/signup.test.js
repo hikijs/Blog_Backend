@@ -1,8 +1,7 @@
 /* global beforeAll, afterAll, describe, test, expect */
 const axios = require('axios');
 const nock = require('nock');
-const { releaseDatabaseConnection } = require('../../src/dbs/setupDatabase');
-const serverStart = require('../mocks/server.mock');
+const { serverStart, serverStop } = require('../mocks/server.mock');
 const Database = require('../../src/dbs/init.mysql');
 
 // regulare express for public key is heximal string with length is 128
@@ -38,7 +37,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	releaseDatabaseConnection();
+	serverStop();
 });
 
 describe('/api', () => {

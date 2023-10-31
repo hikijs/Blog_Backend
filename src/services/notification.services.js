@@ -26,7 +26,9 @@ class NotifyAbstract {
 
 	async updateDeliveryData() {
 		if (!this.senderId || !this.receiverId) {
-			throw BadRequestError('No delivery information');
+			throw new BadRequestError({
+				message: 'No delivery information'
+			});
 		}
 
 		const senderData = await UserQuery.getBasicUserDataById(this.senderId);
@@ -38,7 +40,10 @@ class NotifyAbstract {
 			this.sender = senderData;
 			this.receiver = receiverData;
 		} else {
-			throw new BadRequestError('Please Check User Infor');
+			throw new BadRequestError(
+				{
+					message: 'Please Check User Infor'
+				});
 		}
 	}
 
