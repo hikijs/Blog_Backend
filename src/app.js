@@ -6,7 +6,9 @@ const compress = require('compression');
 const app = express();
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const { ApiError, NotFoundError } = require('./core/error.response');
 require('dotenv').config();
+
 // eslint-disable-next-line no-undef
 console.info(`===== Enviroment of Node is ${process.env.NODE_ENV} =====`);
 //A. init middeware
@@ -43,25 +45,20 @@ const initializeWebServer = () => {
 			// eslint-disable-next-line no-undef
 			app.use(express.static(path.join(__dirname, '..', 'uploads')));
 			//init routes
-			app.use(require('./routers'));
+			const router = require('./routers');
+			app.use(router);
 
 			// handling error
 			app.use((req, res, next) => {
-				console.error('SERVER ERROR: Not Found Route');
-				const error = new Error('Not Found');
-				error.status = 404;
+				const error = new NotFoundError({});
 				next(error);
 			});
 
 			// eslint-disable-next-line no-unused-vars
 			app.use((error, req, res, next) => {
-				console.error('SERVER ERROR: Error Happen');
-				const statusCode = error.status || 500;
-				return res.status(statusCode).json({
-					status: 'error',
-					code: statusCode,
-					message: error.message || 'internal server error',
-				});
+				// The error was handle by ApiError class
+				console.error(error);
+				ApiError.handleError(error, res);
 			});
 			// eslint-disable-next-line no-undef
 			const PORT = process.env.PORT || 3000;

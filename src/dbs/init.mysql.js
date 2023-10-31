@@ -31,7 +31,12 @@ class Database {
 		return Database.instance;
 	}
 
+	static isExistInstance() {
+		return Database.instance;
+	}
+
 	releaseAllConnection() {
+		console.log('Down All Connection To Mysql');
 		if (this.typeConnection == TYPE_CONNECTION_DB.pool && this.pool) {
 			this.pool.end();
 		}
