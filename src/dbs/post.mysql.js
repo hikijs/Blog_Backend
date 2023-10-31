@@ -178,7 +178,10 @@ class PostQuery extends QueryBase {
 			return listCategrory;
 		} catch (error) {
 			console.error(error);
-			throw new BadRequestError('Issue happen when getting categrory');
+			throw new BadRequestError(
+				{
+					message: 'Issue happen when getting categrory'
+				});
 		}
 	}
 
@@ -355,7 +358,10 @@ class PostQuery extends QueryBase {
 				return false;
 			}
 		} catch (error) {
-			throw BadRequestError('Issue when getting post');
+			throw new BadRequestError(
+				{
+					message: 'Issue when getting post'
+				});
 		}
 	}
 

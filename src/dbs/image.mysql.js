@@ -11,7 +11,10 @@ class ImageData extends QueryBase {
 			const imageId = await this.getImageFromUrl(imageUrl);
 			return imageId;
 		} catch (error) {
-			throw new BadRequestError('The issue when uploading image ', 400);
+			throw new BadRequestError(
+				{
+					message: 'The issue when uploading image '
+				});
 		}
 	}
 
@@ -94,7 +97,10 @@ class ImageData extends QueryBase {
 			console.log('INSERT: the new image was inserted successfully');
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestError('The issue when uploading image ', 400);
+			throw new BadRequestError(
+				{
+					message: 'The issue when uploading image'
+				});
 		}
 	}
 }
