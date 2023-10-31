@@ -23,8 +23,10 @@ const initializeDatabase = async () => {
 const releaseDatabaseConnection = async () => {
 	const Database = require('./init.mysql');
 	console.time('>>> release DB connection');
-	const dbInstance = Database.getInstance();
-	dbInstance.releaseAllConnection();
+	const dbInstance = Database.isExistInstance();
+	if (dbInstance) {
+		dbInstance.releaseAllConnection();
+	}
 	console.timeEnd('>>> release DB connection');
 };
 

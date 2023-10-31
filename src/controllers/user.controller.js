@@ -1,5 +1,5 @@
 'use strict';
-const { OK } = require('../core/success.response');
+const { OK } = require('../core/response/apiSuccessResponse');
 
 const UserService = require('../services/user.services');
 

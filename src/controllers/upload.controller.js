@@ -1,5 +1,5 @@
 'use strict';
-const { OK, CREATED } = require('../core/success.response');
+const { OK, CREATED } = require('../core/response/apiSuccessResponse');
 
 const UploadService = require('../services/upload.services');
 class UploadController {
