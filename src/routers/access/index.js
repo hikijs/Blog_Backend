@@ -5,9 +5,15 @@ const router = express.Router();
 const { asyncHanlder } = require('../../helpers/asyncHandler');
 const accessController = require('../../controllers/access.controller');
 const { authentication, verifyResetPassword } = require('../../auth/authUtils');
+const Validator = require('../../middelwares/validator');
+const AuthenticaseBasicSchema = require('./authenticationTemplate');
 require('dotenv').config();
 // signup
-router.post('/signup', asyncHanlder(accessController.signUp));
+router.post(
+	'/signup',
+	Validator(AuthenticaseBasicSchema.SIGNUP),
+	asyncHanlder(accessController.signUp)
+);
 //login
 router.post('/login', asyncHanlder(accessController.login));
 // forgot password

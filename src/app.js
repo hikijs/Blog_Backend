@@ -57,7 +57,7 @@ const initializeWebServer = () => {
 			// eslint-disable-next-line no-unused-vars
 			app.use((error, req, res, next) => {
 				// The error was handle by ApiError class
-				console.error(error);
+				console.log(error);
 				ApiError.handleError(error, res);
 			});
 			// eslint-disable-next-line no-undef
