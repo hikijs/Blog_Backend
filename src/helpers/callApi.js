@@ -24,4 +24,16 @@ const putApi = async (url) => {
 	}
 };
 
-module.exports = { getApi, putApi };
+const postApi = async (url, header, body) => {
+	console.log(`BE call GET api for ${url}`);
+	try {
+		const result = await axios.post(url , body, header);
+		console.log(result);
+		return result.data;
+	} catch (error) {
+		console.log(error);
+		return error;
+	}
+};
+
+module.exports = { getApi, putApi, postApi };

@@ -13,5 +13,7 @@ router.use('/v1/api/oauth', require('./accessOauth'));
 router.use('/v1/api/upload', require('./upload'));
 router.use('/v1/api/post', require('./post'));
 router.use('/v1/api/user', require('./user'));
+router.use('/v1/api/docker', require('./webhook'));
+
 
 module.exports = router;
