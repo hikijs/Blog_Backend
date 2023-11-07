@@ -64,12 +64,12 @@ const initializeWebServer = () => {
 			const PORT = process.env.PORT || 3000;
 			connection = app.listen(PORT, () => {
 				console.log(`Application is listen on port ${PORT}`);
-				console.timeEnd('>>>>> Start Application');
+				console.timeEnd('>>> Start Application');
 				resolve(connection.address());
 			});
 		} catch (error) {
 			console.error(error);
-			console.timeEnd('>>>>> Start Application');
+			console.timeEnd('>>> Start Application');
 			reject(null);
 		}
 	});
