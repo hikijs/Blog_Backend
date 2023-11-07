@@ -13,22 +13,14 @@ class RabbitMq {
 	}
 
 	static async getInstance(exchangeName) {
-		try {
-			if (!RabbitMq.instances[exchangeName]) {
-				RabbitMq.instances[exchangeName] = new RabbitMq();
-				await RabbitMq.instances[exchangeName].connect(
-					rabbitmqConnectStr,
-					exchangeName
-				);
-			}
-			return RabbitMq.instances[exchangeName];
-		} catch (error) {
-			console.log(
-				'Preparing Connecting to Rabbit MQ failed with reason ',
-				error
+		if (!RabbitMq.instances[exchangeName]) {
+			RabbitMq.instances[exchangeName] = new RabbitMq();
+			await RabbitMq.instances[exchangeName].connect(
+				rabbitmqConnectStr,
+				exchangeName
 			);
-			return null;
 		}
+		return RabbitMq.instances[exchangeName];
 	}
 
 	async connect(connectStr, exchangeName, typeExchange = 'direct') {

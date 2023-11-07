@@ -10,8 +10,10 @@ const initializeRabbitMQ = async () => {
 		);
 		console.log('Connect to Rabbit MQ Success');
 	} catch (error) {
-		console.log('Connect to Rabbit MQ Failure');
-		console.error(error);
+		console.log(
+			'Preparing Connecting to Rabbit MQ failed with reason ',
+			error
+		);
 		throw new Error(error);
 	}
 	console.timeEnd('>>> MQ Setup');
