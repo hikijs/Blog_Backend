@@ -1,3 +1,4 @@
+#!/bin/bash
 UPGRADE_FILE="upgrade.json"
 # Initialize password variable
 PASSWORD=""
@@ -22,7 +23,7 @@ done
 
 # Check if a password is provided
 if [ -z "$PASSWORD" ]; then
-  echo "${RED}Please provide a password using the -p option${NC}"
+  echo -e "${RED}Please provide a password using the -p option${NC}"
   exit 1
 fi
 
@@ -40,31 +41,31 @@ cd "$PROJECT_DIR"
 # Read the backend version from JSON
 BACKEND_VERSION=$(jq .backend "$UPGRADE_FILE" | tr -d '"')
 
-echo "${YELLOW}The Backend version to be built is $BACKEND_VERSION${NC}"
+echo -e "${YELLOW}The Backend version to be built is $BACKEND_VERSION${NC}"
 
 # Build the Docker image
 IMAGE_NAME="hunghoang149/blog:$BACKEND_VERSION"
-echo "${BLUE}Starting Docker image build: $IMAGE_NAME${NC}"
+echo -e "${BLUE}Starting Docker image build: $IMAGE_NAME${NC}"
 
 # Build the Docker image
 echo "$PASSWORD" | sudo -S docker build . -t "$IMAGE_NAME"
 if [ $? -ne 0 ]; then
-  echo "${RED}Docker build failed.${NC}"
+  echo -e "${RED}Docker build failed.${NC}"
   exit 1
 fi
 
 # Push the Docker image to DockerHub
 sudo -S docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
 if [ $? -ne 0 ]; then
-  echo "${RED}Failed to log in to Docker Registry.${NC}"
+  echo -e "${RED}Failed to log in to Docker Registry.${NC}"
   exit 1
 fi
 
 echo "$PASSWORD" | sudo -S docker push "$IMAGE_NAME"
 if [ $? -ne 0 ]; then
-  echo "${RED}Failed to push to DockerHub.${NC}"
+  echo -e "${RED}Failed to push to DockerHub.${NC}"
   exit 1
 fi
 
-echo "${GREEN}Docker Build and Push to DockerHub completed successfully.${NC}"
+echo -e "${GREEN}Docker Build and Push to DockerHub completed successfully.${NC}"
 exit 0
