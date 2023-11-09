@@ -1,0 +1,15 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "ActionsTest" ]
+  pull_request:
+    branches: [ "ActionsTest" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: build and push to dockerhub
+      run: ./deployment/build.sh
