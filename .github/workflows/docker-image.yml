@@ -22,7 +22,9 @@ jobs:
         BACKEND_VERSION=$(jq .backend "$UPGRADE_FILE" | tr -d '"')
         echo $BACKEND_VERSION
     - name: Build Image
-      run: docker build . -t "${{ secrets.DOCKER_USER }}"/blog:"$BACKEND_VERSION"
+      run: |
+        echo "docker build . -t "${{ secrets.DOCKER_USER }}"/blog:$"{{BACKEND_VERSION }}""
+        docker build . -t "${{ secrets.DOCKER_USER }}"/blog:$"{{BACKEND_VERSION}}"
     - name: Login to Docker Hub
       run: docker login -u "${{ secrets.DOCKER_USER }}" -p "${{ secrets.DOCKER_PASSWORD }}"
     - name: Push To Docker Hub
