@@ -1,0 +1,35 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "ActionsTest" ]
+  pull_request:
+    branches: [ "ActionsTest" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create Environment
+      run: |
+        touch .env
+        echo "${{ secrets.ENV }}" > .env
+        cat .env       
+    - name: Build Image
+      run: |
+        UPGRADE_FILE="upgrade.json"
+        BACKEND_VERSION=$(jq .backend "$UPGRADE_FILE" | tr -d '"')
+        echo $BACKEND_VERSION
+        echo "docker build . -t "${{ secrets.DOCKER_USER }}"/blog:$BACKEND_VERSION"
+        docker build . -t "${{ secrets.DOCKER_USER }}"/blog:$BACKEND_VERSION
+    - name: Login to Docker Hub
+      run: docker login -u "${{ secrets.DOCKER_USER }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+    - name: Push To Docker Hub
+      run: |
+        UPGRADE_FILE="upgrade.json"
+        BACKEND_VERSION=$(jq .backend "$UPGRADE_FILE" | tr -d '"')
+        echo $BACKEND_VERSION
+        docker push "${{ secrets.DOCKER_USER }}"/blog:"$BACKEND_VERSION"
+        
+
