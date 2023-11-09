@@ -26,5 +26,10 @@ jobs:
     - name: Login to Docker Hub
       run: docker login -u "${{ secrets.DOCKER_USER }}" -p "${{ secrets.DOCKER_PASSWORD }}"
     - name: Push To Docker Hub
-      run: docker push "${{ secrets.DOCKER_USER }}"/blog:"$BACKEND_VERSION"
+      run: |
+        UPGRADE_FILE="upgrade.json"
+        BACKEND_VERSION=$(jq .backend "$UPGRADE_FILE" | tr -d '"')
+        echo $BACKEND_VERSION
+        docker push "${{ secrets.DOCKER_USER }}"/blog:"$BACKEND_VERSION"
+        
 
