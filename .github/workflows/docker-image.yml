@@ -11,5 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: build and push to dockerhub
-      run: ./deployment/build.sh -p ''
+    - name: Create Environment
+      run: |
+        touch .env
+        echo "${{ secrets.ENV }}" > .env
+    - name: Get Current Version Of Backend
+      run: |
+        UPGRADE_FILE="upgrade.json"
+        BACKEND_VERSION=$(jq .backend "$UPGRADE_FILE" | tr -d '"')
+    - name: Build Image
+      run: docker build . -t "${{ secrets.DOCKER_USER }}"/blog:"$BACKEND_VERSION"
+    - name: Login to Docker Hub
+      run: docker login -u "${{ secrets.DOCKER_USER }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+    - name: Push To Docker Hub
