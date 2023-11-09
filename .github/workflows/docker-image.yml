@@ -12,4 +12,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: build and push to dockerhub
-      run: docker build . -t test
+      run: ./deployment/build.sh -p ''
