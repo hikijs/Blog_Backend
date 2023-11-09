@@ -15,16 +15,14 @@ jobs:
       run: |
         touch .env
         echo "${{ secrets.ENV }}" > .env
-        cat .env
-    - name: Get Current Version Of Backend
+        cat .env       
+    - name: Build Image
       run: |
         UPGRADE_FILE="upgrade.json"
         BACKEND_VERSION=$(jq .backend "$UPGRADE_FILE" | tr -d '"')
         echo $BACKEND_VERSION
-    - name: Build Image
-      run: |
         echo "docker build . -t "${{ secrets.DOCKER_USER }}"/blog:$BACKEND_VERSION"
-        docker build . -t "${{ secrets.DOCKER_USER }}"/blog:$"{{BACKEND_VERSION}}"
+        docker build . -t "${{ secrets.DOCKER_USER }}"/blog:$BACKEND_VERSION
     - name: Login to Docker Hub
       run: docker login -u "${{ secrets.DOCKER_USER }}" -p "${{ secrets.DOCKER_PASSWORD }}"
     - name: Push To Docker Hub
