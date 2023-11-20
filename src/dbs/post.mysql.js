@@ -178,10 +178,9 @@ class PostQuery extends QueryBase {
 			return listCategrory;
 		} catch (error) {
 			console.error(error);
-			throw new BadRequestError(
-				{
-					message: 'Issue happen when getting categrory'
-				});
+			throw new BadRequestError({
+				message: 'Issue happen when getting categrory',
+			});
 		}
 	}
 
@@ -220,10 +219,7 @@ class PostQuery extends QueryBase {
 			let postSummarizeContents = [];
 			let index = 0;
 			postData.forEach((element) => {
-				let postSummarize = new PostSummarizeContent(
-					element,
-					index
-				);
+				let postSummarize = new PostSummarizeContent(element, index);
 				postSummarizeContents.push(
 					postSummarize.getSantilizedPostData()
 				);
@@ -274,10 +270,7 @@ class PostQuery extends QueryBase {
 			let postSummarizeContents = [];
 			let index = 0;
 			postData.forEach((element) => {
-				let postSummarize = new PostSummarizeContent(
-					element,
-					index
-				);
+				let postSummarize = new PostSummarizeContent(element, index);
 				postSummarizeContents.push(
 					postSummarize.getSantilizedPostData()
 				);
@@ -295,9 +288,7 @@ class PostQuery extends QueryBase {
 	async getNumberPostOfUser(userId) {
 		const numsPostQuery =
 			'SELECT COUNT(*) AS total_records FROM POST WHERE userId = ?';
-		const result = await this.dbInstance.hitQuery(numsPostQuery, [
-			userId,
-		]);
+		const result = await this.dbInstance.hitQuery(numsPostQuery, [userId]);
 		return result[0]['total_records'];
 	}
 
@@ -349,10 +340,9 @@ class PostQuery extends QueryBase {
 				return false;
 			}
 		} catch (error) {
-			throw new BadRequestError(
-				{
-					message: 'Issue when getting post'
-				});
+			throw new BadRequestError({
+				message: 'Issue when getting post',
+			});
 		}
 	}
 

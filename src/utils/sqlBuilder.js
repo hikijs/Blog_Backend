@@ -41,10 +41,9 @@ class SqlBuilder {
 			console.log(queryName);
 			const queryData = queries[queryName];
 			if (!validateAttrUpdatePost(queryName, queryData)) {
-				throw new BadRequestError(
-					{
-						message: 'The queries data is not correct'
-					});
+				throw new BadRequestError({
+					message: 'The queries data is not correct',
+				});
 			}
 			if (queryData) {
 				query += ` ${queryName} = ?,`;
@@ -70,10 +69,9 @@ class SqlBuilder {
 				emailChange = true;
 			}
 			if (!validateAttrUpdateUser(queryName)) {
-				throw new BadRequestError(
-					{
-						message: 'The queries data is not correct'
-					});
+				throw new BadRequestError({
+					message: 'The queries data is not correct',
+				});
 			}
 			if (queryData) {
 				query += ` ${queryName} = ?,`;
