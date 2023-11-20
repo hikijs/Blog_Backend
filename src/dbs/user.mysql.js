@@ -194,7 +194,12 @@ class UserQuery extends QueryBase {
 	async deleteUser(userId) {
 		const query = 'DELETE FROM USER WHERE userId = ?';
 		const result = await this.dbInstance.hitQuery(query, [userId]);
-		console.log(result);
+		return result;
+	}
+
+	async deleteUserByUserName(userName) {
+		const query = 'DELETE FROM USER WHERE userName = ?';
+		const result = await this.dbInstance.hitQuery(query, [userName]);
 		return result;
 	}
 

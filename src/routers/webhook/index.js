@@ -6,9 +6,9 @@ const { asyncHanlder } = require('../../helpers/asyncHandler');
 const { OK } = require('../../core/response/apiSuccessResponse');
 require('dotenv').config();
 const { postApi } = require('../../helpers/callApi');
-// eslint-disable-next-line no-unused-vars
 router.get(
 	'/hooking',
+	// eslint-disable-next-line no-unused-vars
 	asyncHanlder(async (req, res, next) => {
 		console.log(req);
 		console.log(req.body);
