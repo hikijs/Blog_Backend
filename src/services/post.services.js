@@ -10,7 +10,6 @@ const { SavePostQuery } = require('../dbs/savePost.mysql');
 const { InternalCode } = require('../core/response/responseConfig');
 const POST_BODY = {
 	POST_TITLE: 'postTitle',
-	POST_STATUS: 'postStatus',
 	POST_PERMIT: 'postPermit',
 	POST_CATEGORY: 'postCategory',
 	POST_SUMMARIZE: 'postSummarize',
@@ -51,7 +50,7 @@ class PostService {
 	static publishPost = async (req) => {
 		const userId = req.cookies.userId;
 		const postTitle = req.body[POST_BODY.POST_TITLE];
-		const postStatus = req.body[POST_BODY.POST_STATUS]; // should skip because when publish it always is publish
+		const postStatus = 'publish';
 		const postPermit = req.body[POST_BODY.POST_PERMIT];
 		const postSummarize = req.body[POST_BODY.POST_SUMMARIZE];
 		const postContent = req.body[POST_BODY.POST_CONTENT];
@@ -67,12 +66,6 @@ class PostService {
 		) {
 			throw new BadRequestError({
 				message: 'Not Enough Headers',
-			});
-		}
-
-		if (postStatus !== 'publish') {
-			throw new BadRequestError({
-				message: 'Post status should be Publish',
 			});
 		}
 
@@ -108,7 +101,7 @@ class PostService {
 		const userId = req.cookies.userId;
 		const parsingPostData = JSON.parse(req.body.postData);
 		const postTitle = parsingPostData[POST_BODY.POST_TITLE];
-		const postStatus = parsingPostData[POST_BODY.POST_STATUS]; // should skip because when publish it always is publish
+		const postStatus = 'publish';
 		const postPermit = parsingPostData[POST_BODY.POST_PERMIT];
 		const postSummarize = parsingPostData[POST_BODY.POST_SUMMARIZE];
 		const postContent = parsingPostData[POST_BODY.POST_CONTENT];
@@ -133,11 +126,6 @@ class PostService {
 			});
 		}
 
-		if (postStatus !== 'publish') {
-			throw new BadRequestError({
-				message: 'Post status should be Publish',
-			});
-		}
 
 		const categoryData = await PostQuery.getCategory(postCategory);
 		if (categoryData == null) {
