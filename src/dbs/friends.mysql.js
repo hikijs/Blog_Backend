@@ -137,7 +137,7 @@ class FriendQuery extends QueryBase {
 			'SELECT COUNT(*) FROM FRIEND_REQUESTS WHERE requesterId = ? AND recipientId = ?';
 		let listParams = [requesterId, recipientId];
 		if (status) {
-			query = query + 'AND status = ?';
+			query = query + ' AND status = ?';
 			listParams.push(status);
 		}
 		const result = await this.dbInstance.hitQuery(query, listParams);

@@ -1,8 +1,13 @@
-const { BadRequestError, AuthFailureError } = require('../core/error.response');
+const {
+	BadRequestError,
+	AuthFailureError,
+	InternalError
+} = require('../core/error.response');
 const PostQuery = require('../dbs/post.mysql');
 const TransactionQuery = require('../dbs/transaction.mysql');
 const ImageData = require('../dbs/image.mysql');
 const { SavePostQuery } = require('../dbs/savePost.mysql');
+const { InternalCode } = require('../core/response/responseConfig');
 const POST_BODY = {
 	POST_TITLE: 'postTitle',
 	POST_STATUS: 'postStatus',
@@ -472,12 +477,19 @@ class PostService {
 					message: 'Not Enough Info'
 				});
 		}
-		const numberPosts = await PostQuery.getNumberPostOfUser(userId);
-		const listPost = await PostQuery.getPostByUserId(userId, numberPosts);
-		return {
-			numberPosts: numberPosts,
-			listPost: listPost,
-		};
+		try {
+			const numberPosts = await PostQuery.getNumberPostOfUser(userId);
+			const listPost = await PostQuery.getPostByUserId(userId, numberPosts);
+			return {
+				numberPosts: numberPosts,
+				listPost: listPost,
+			};
+		} catch (error) {
+			throw new InternalError({
+				message: "Internal Server Error When Getting My Posts",
+				internalCode: InternalCode.NOT_FOUND
+			});
+		}
 	};
 
 	static getAllPost = async (req) => {
@@ -488,12 +500,19 @@ class PostService {
 					message: 'Not Enough Info'
 				});
 		}
-		const numberPosts = await PostQuery.getNumberPostFollowedByUser(userId);
-		const listPost = await PostQuery.getPostByUserIdV2(userId, numberPosts);
-		return {
-			numberPosts: numberPosts,
-			listPost: listPost,
-		};
+		try {
+			const numberPosts = await PostQuery.getNumberPostFollowedByUser(userId);
+			const listPost = await PostQuery.getPostByUserIdV2(userId, numberPosts);
+			return {
+				numberPosts: numberPosts,
+				listPost: listPost,
+			};
+		} catch (error) {
+			throw new InternalError({
+				message: "Internal Server Error When Getting All Posts",
+				internalCode: InternalCode.NOT_FOUND
+			});
+		}
 	};
 
 	static savePost = async (req) => {
