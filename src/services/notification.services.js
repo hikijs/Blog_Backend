@@ -27,7 +27,7 @@ class NotifyAbstract {
 	async updateDeliveryData() {
 		if (!this.senderId || !this.receiverId) {
 			throw new BadRequestError({
-				message: 'No delivery information'
+				message: 'No delivery information',
 			});
 		}
 
@@ -40,10 +40,9 @@ class NotifyAbstract {
 			this.sender = senderData;
 			this.receiver = receiverData;
 		} else {
-			throw new BadRequestError(
-				{
-					message: 'Please Check User Infor'
-				});
+			throw new BadRequestError({
+				message: 'Please Check User Infor',
+			});
 		}
 	}
 

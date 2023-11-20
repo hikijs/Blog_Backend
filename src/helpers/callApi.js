@@ -25,9 +25,9 @@ const putApi = async (url) => {
 };
 
 const postApi = async (url, header, body) => {
-	console.log(`BE call GET api for ${url}`);
+	console.log(`BE call POST api for ${url}`);
 	try {
-		const result = await axios.post(url , body, header);
+		const result = await axios.post(url, body, header);
 		console.log(result);
 		return result.data;
 	} catch (error) {

@@ -43,45 +43,40 @@ const authentication = asyncHanlder(async (req, res, next) => {
 	const { accessToken, userId } = req.cookies;
 	//1
 	if (!userId) {
-		throw new AuthFailureError(
-			{
-				message: 'Invalid request'
-			});
+		throw new AuthFailureError({
+			message: 'Invalid request',
+		});
 	}
 	//2
 	const keyStore = await KeyStoreQuery.getKeyStore(userId);
 	//    console.log(`Key store maybe is ${keyStore}`)
 	if (keyStore == null) {
-		throw new BadRequestError(
-			{
-				message:'Not Found KeyStore'
-			});
+		throw new BadRequestError({
+			message: 'Not Found KeyStore',
+		});
 	}
 	//3
 	if (!accessToken) {
-		throw new AuthFailureError(
-			{
-				message:'Invalid authorization'
-			});
+		throw new AuthFailureError({
+			message: 'Invalid authorization',
+		});
 	}
 
 	try {
 		//    console.log(`public key ${keyStore.publicKey} and private key ${keyStore.privateKey}`)
 		const decodeUser = JWT.verify(accessToken, keyStore.privateKey);
 		if (userId !== decodeUser.userId) {
-			throw new AuthFailureError(
-				{
-					message:'Can not verify key'
-				});
+			throw new AuthFailureError({
+				message: 'Can not verify key',
+			});
 		}
 		req.keyStore = keyStore;
 		//    console.log(keyStore)
 		next();
 	} catch (error) {
-		throw new AuthFailureError(
-			{
-				message:'Is there something wrong when verify key'
-			});
+		throw new AuthFailureError({
+			message: 'Is there something wrong when verify key',
+		});
 	}
 });
 
@@ -89,10 +84,9 @@ const authentication = asyncHanlder(async (req, res, next) => {
 const verifyResetPassword = asyncHanlder(async (req, res, next) => {
 	const { userId, verifyCode } = req.cookies;
 	if (!userId || !verifyCode) {
-		throw new BadRequestError(
-			{
-				message:'Please provide more input data'
-			});
+		throw new BadRequestError({
+			message: 'Please provide more input data',
+		});
 	}
 	// verify code should be exist in db
 	const codeExisting = await VerifyCodeQuery.checkCodeExistOrNot(
@@ -102,18 +96,15 @@ const verifyResetPassword = asyncHanlder(async (req, res, next) => {
 	);
 
 	if (codeExisting == null) {
-		throw new AuthFailureError(
-			{
-				message:'Not correct Code or userID'
-			});
+		throw new AuthFailureError({
+			message: 'Not correct Code or userID',
+		});
 	}
 	if (codeExisting.expireTime < Date.now()) {
-		throw new BadRequestError(
-			{
-				message: `The verify code timeout 
-						${codeExisting.expireTime} < ${new Date(Date.now())}`
-			}
-		);
+		throw new BadRequestError({
+			message: `The verify code timeout 
+						${codeExisting.expireTime} < ${new Date(Date.now())}`,
+		});
 	}
 
 	next();

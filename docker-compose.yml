@@ -64,8 +64,8 @@ services:
                     - utils
 
 networks:
-  blog_network:
-    external: true
+    blog_network:
+        external: true
 
 volumes:
     mysqldata:

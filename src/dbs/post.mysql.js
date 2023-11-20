@@ -2,8 +2,8 @@ const { v4: uuidv4 } = require('uuid');
 
 const SqlBuilder = require('../utils/sqlBuilder');
 const QueryBase = require('./queryBase');
-const { BadRequestError } = require('../core/error.response');
-
+const { BadRequestError, NotFoundError } = require('../core/error.response');
+const { InternalCode } = require('../core/response/responseConfig');
 class PostSummarizeContent {
 	constructor(postData, index) {
 		const {
@@ -178,136 +178,118 @@ class PostQuery extends QueryBase {
 			return listCategrory;
 		} catch (error) {
 			console.error(error);
-			throw new BadRequestError(
-				{
-					message: 'Issue happen when getting categrory'
-				});
+			throw new BadRequestError({
+				message: 'Issue happen when getting categrory',
+			});
 		}
 	}
 
 	async getPostByUserId(userId, numberPosts) {
-		try {
-			const getPost = `SELECT
-                          P.postId,
-                          I1.imageUrl AS thumbnailUrl,
-                          P.title,
-                          C.categroryName,
-                          P.statusEdit,
-                          P.sharePermission,
-                          P.summarize,
-                          P.created_at,
-                          P.updated_at,
-                          U.userId, 
-                          U.userName,
-                          I2.imageUrl AS avatarUrl
-                        FROM
-                            POST P
-                        JOIN USER U
-                        ON P.userId = U.userId
-                        LEFT JOIN IMAGE I1
-                          ON U.userId = I1.postId AND I1.topic = 'thumnail'
-                        LEFT JOIN IMAGE I2
-                          ON P.postId = I2.userId AND I2.topic = 'avatar'
-                        INNER JOIN POSTCATEGORY PS
-                          ON PS.postId = P.postId
-                        INNER JOIN CATEGORY C
-                          ON C.categroryId = PS.categroryId
-                        WHERE
-                            P.userId = ?
-                        ORDER BY
-                        P.created_at DESC;`;
-			const postData = await this.dbInstance.hitQuery(getPost, [userId]);
-			if (postData.length == numberPosts) {
-				let postSummarizeContents = [];
-				let index = 0;
-				postData.forEach((element) => {
-					let postSummarize = new PostSummarizeContent(
-						element,
-						index
-					);
-					postSummarizeContents.push(
-						postSummarize.getSantilizedPostData()
-					);
-					index = index + 1;
-				});
-				return postSummarizeContents;
-			} else {
-				return null;
-			}
-		} catch (error) {
-			console.log(error);
-			return null;
+		const getPost = `SELECT
+						P.postId,
+						I1.imageUrl AS thumbnailUrl,
+						P.title,
+						C.categroryName,
+						P.statusEdit,
+						P.sharePermission,
+						P.summarize,
+						P.created_at,
+						P.updated_at,
+						U.userId, 
+						U.userName,
+						I2.imageUrl AS avatarUrl
+					FROM
+						POST P
+					JOIN USER U
+					ON P.userId = U.userId
+					LEFT JOIN IMAGE I1
+						ON U.userId = I1.postId AND I1.topic = 'thumnail'
+					LEFT JOIN IMAGE I2
+						ON P.postId = I2.userId AND I2.topic = 'avatar'
+					INNER JOIN POSTCATEGORY PS
+						ON PS.postId = P.postId
+					INNER JOIN CATEGORY C
+						ON C.categroryId = PS.categroryId
+					WHERE
+						P.userId = ?
+					ORDER BY
+					P.created_at DESC;`;
+		const postData = await this.dbInstance.hitQuery(getPost, [userId]);
+		if (postData.length == numberPosts) {
+			let postSummarizeContents = [];
+			let index = 0;
+			postData.forEach((element) => {
+				let postSummarize = new PostSummarizeContent(element, index);
+				postSummarizeContents.push(
+					postSummarize.getSantilizedPostData()
+				);
+				index = index + 1;
+			});
+			return postSummarizeContents;
+		} else {
+			throw new NotFoundError({
+				message: 'Conflict Happen When Getting All Posts',
+				internalCode: InternalCode.NOT_FOUND,
+			});
 		}
 	}
 
 	async getPostByUserIdV2(userId, numberPosts) {
-		try {
-			const getPost = `SELECT P.postId,
-                                I1.imageUrl AS thumbnailUrl,
-                                P.title,
-                                C.categroryName,
-                                P.statusEdit,
-                                P.sharePermission,
-                                P.summarize,
-                                P.created_at,
-                                P.updated_at,
-                                U1.userId,
-                                U1.userName,
-                                I2.imageUrl AS avatarUrl
-                          FROM POST P 
-                          LEFT JOIN USER AS U1 ON U1.userId = P.userId
-                          LEFT JOIN IMAGE AS I1 ON P.postId = I1.postId and I1.topic='thumnail'
-                          LEFT JOIN IMAGE AS I2 ON P.userId = I2.userId and I2.topic='avatar'
-                          LEFT JOIN FRIENDSHIPS AS F ON F.userAId = U1.userId AND F.userBId = ?
-                          INNER JOIN POSTCATEGORY PS
-                          ON PS.postId = P.postId
-                          INNER JOIN CATEGORY C
-                          ON C.categroryId = PS.categroryId
-                          WHERE P.statusEdit = 'publish'
-                                AND P.sharePermission IN ('public', 'follower')
-                                AND F.userBId = ?
-                                OR U1.userId = ?
-                          ORDER BY P.updated_at DESC`;
-			const postData = await this.dbInstance.hitQuery(getPost, [
-				userId,
-				userId,
-				userId,
-				userId,
-			]);
-			if (postData.length == numberPosts) {
-				let postSummarizeContents = [];
-				let index = 0;
-				postData.forEach((element) => {
-					let postSummarize = new PostSummarizeContent(
-						element,
-						index
-					);
-					postSummarizeContents.push(
-						postSummarize.getSantilizedPostData()
-					);
-					index = index + 1;
-				});
-				return postSummarizeContents;
-			} else {
-				return null;
-			}
-		} catch (error) {
-			console.log(error);
-			return null;
+		const getPost = `SELECT P.postId,
+							I1.imageUrl AS thumbnailUrl,
+							P.title,
+							C.categroryName,
+							P.statusEdit,
+							P.sharePermission,
+							P.summarize,
+							P.created_at,
+							P.updated_at,
+							U1.userId,
+							U1.userName,
+							I2.imageUrl AS avatarUrl
+						FROM POST P 
+						LEFT JOIN USER AS U1 ON U1.userId = P.userId
+						LEFT JOIN IMAGE AS I1 ON P.postId = I1.postId and I1.topic='thumnail'
+						LEFT JOIN IMAGE AS I2 ON P.userId = I2.userId and I2.topic='avatar'
+						LEFT JOIN FRIENDSHIPS AS F ON F.userAId = U1.userId AND F.userBId = ?
+						INNER JOIN POSTCATEGORY PS
+						ON PS.postId = P.postId
+						INNER JOIN CATEGORY C
+						ON C.categroryId = PS.categroryId
+						WHERE P.statusEdit = 'publish'
+							AND P.sharePermission IN ('public', 'follower')
+							AND F.userBId = ?
+							OR U1.userId = ?
+						ORDER BY P.updated_at DESC;`;
+		const postData = await this.dbInstance.hitQuery(getPost, [
+			userId,
+			userId,
+			userId,
+		]);
+		if (postData.length == numberPosts) {
+			let postSummarizeContents = [];
+			let index = 0;
+			postData.forEach((element) => {
+				let postSummarize = new PostSummarizeContent(element, index);
+				postSummarizeContents.push(
+					postSummarize.getSantilizedPostData()
+				);
+				index = index + 1;
+			});
+			return postSummarizeContents;
+		} else {
+			throw new NotFoundError({
+				message: 'Conflict Happen When Getting My Posts',
+				internalCode: InternalCode.NOT_FOUND,
+			});
 		}
 	}
 
 	async getNumberPostOfUser(userId) {
-		try {
-			const numsPostQuery =
-				'SELECT COUNT(*) AS total_records FROM POST WHERE userId = ?';
-			const result = await this.dbInstance.hitQuery(numsPostQuery, [
-				userId,
-			]);
-			return result[0]['total_records'];
-		} catch (error) {
-			return null;
-		}
+		const numsPostQuery =
+			'SELECT COUNT(*) AS total_records FROM POST WHERE userId = ?';
+		const result = await this.dbInstance.hitQuery(numsPostQuery, [userId]);
+		return result[0]['total_records'];
 	}
 
 	async getNumberPostFollowedByUser(userId) {
@@ -358,10 +340,9 @@ class PostQuery extends QueryBase {
 				return false;
 			}
 		} catch (error) {
-			throw new BadRequestError(
-				{
-					message: 'Issue when getting post'
-				});
+			throw new BadRequestError({
+				message: 'Issue when getting post',
+			});
 		}
 	}
 
