@@ -15,15 +15,6 @@ const POST_BODY = {
 	POST_SUMMARIZE: 'postSummarize',
 	POST_CONTENT: 'postContent',
 };
-function getFirst100Words(text) {
-	// Split the text into an array of words
-	const words = text.split(' ');
-
-	// Get the first 100 words or the entire text if it has less than 100 words
-	const first100Words = words.slice(0, 100).join(' ');
-
-	return first100Words;
-}
 
 class PostService {
 	static async updatePostStatus(newStatusEdit, postId) {
@@ -220,29 +211,27 @@ class PostService {
 				message: `post with id ${postId} did not exist`,
 			});
 		}
-		const { title, statusEdit, sharePermission, categroryName } = req.query;
-		const { postContent } = req.body;
+		const { title, statusEdit, sharePermission, summarize, content } = req.body;
+		// FIXME: till know please dont update categoryName because this have many issues
+		// because in the initial the design db is many to many for category and post but the logic know
+		// is good for case one to one.
 		var categroryId = null;
-		if (categroryName) {
-			const existingCategory = await PostQuery.getCategory(categroryName);
-			if (existingCategory == null) {
-				throw new BadRequestError({
-					message: 'The category does not exist',
-				});
-			} else {
-				categroryId = existingCategory.categroryId;
-			}
-		}
-		var summarize = null;
-		if (postContent) {
-			summarize = getFirst100Words(postContent);
-		}
+		// if (categroryName) {
+		// 	const existingCategory = await PostQuery.getCategory(categroryName);
+		// 	if (existingCategory == null) {
+		// 		throw new BadRequestError({
+		// 			message: 'The category does not exist',
+		// 		});
+		// 	} else {
+		// 		categroryId = existingCategory.categroryId;
+		// 	}
+		// }
 		const queriesData = {
 			title: title,
 			statusEdit: statusEdit,
 			sharePermission: sharePermission,
 			summarize: summarize,
-			content: postContent,
+			content: content
 		};
 		try {
 			await PostQuery.updatePost(queriesData, postId, categroryId);
