@@ -23,7 +23,10 @@ pull() {
 resetWorkDir() {
 	echo -e "${YELLOW}>> BACK TO CURRENT WORKING DIR${NC}"
 	git checkout "$CURRENT_BRANCH"
-	git stash pop stash@\{0\}
+	git stash list | grep -q .   
+	if [ $? -eq 0 ]; then
+		git stash pop stash@\{0\}
+	fi
 }
 
 exitFailure () {
