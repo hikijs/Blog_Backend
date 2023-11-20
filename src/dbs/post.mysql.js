@@ -287,9 +287,10 @@ class PostQuery extends QueryBase {
 
 	async getNumberPostOfUser(userId) {
 		const numsPostQuery =
-			'SELECT COUNT(*) AS total_records FROM POST WHERE userId = ?';
+			'SELECT COUNT(*) AS numberPost FROM POST WHERE userId = ?';
 		const result = await this.dbInstance.hitQuery(numsPostQuery, [userId]);
-		return result[0]['total_records'];
+		console.log(result);
+		return result[0]['numberPost'];
 	}
 
 	async getNumberPostFollowedByUser(userId) {
