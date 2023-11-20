@@ -150,12 +150,10 @@ class SavePostQuery extends QueryBase {
 			console.log(
 				`The post ${postId} was does not exist in savelist ${saveListId}`
 			);
-			throw new BadRequestError(
-				{
-					message: `The post ${postId} was does not 
-							  exist in savelist ${saveListId}`
-				}
-			);
+			throw new BadRequestError({
+				message: `The post ${postId} was does not 
+							  exist in savelist ${saveListId}`,
+			});
 		}
 		const query =
 			'DELETE FROM SAVELIST_POST WHERE postId = ? AND saveListId = ?';
@@ -195,10 +193,9 @@ class SavePostQuery extends QueryBase {
 			userId
 		);
 		if (!existingSaveList) {
-			throw new BadRequestError(
-				{
-					message: `The savelist with id ${saveListId} does not exist`
-				});
+			throw new BadRequestError({
+				message: `The savelist with id ${saveListId} does not exist`,
+			});
 		}
 		const query =
 			'DELETE FROM SAVELIST WHERE saveListId = ? AND userId = ?';

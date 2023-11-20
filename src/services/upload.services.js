@@ -9,22 +9,19 @@ class UploadService {
 		let userId = req.cookies.userId;
 		let { topic, postId } = req.query;
 		if (!userId) {
-			throw new AuthFailureError(
-				{
-					message: 'Please verify your authentication'
-				});
+			throw new AuthFailureError({
+				message: 'Please verify your authentication',
+			});
 		}
 		if (!AVATAR_TOPIC.includes(topic)) {
-			throw new BadRequestError(
-				{
-					message: 'Please give correct topic'
-				});
+			throw new BadRequestError({
+				message: 'Please give correct topic',
+			});
 		} else if (topic == 'thumnail' && !postId) {
 			{
-				throw new BadRequestError(
-					{
-						message: 'Please give infor of post'
-					});
+				throw new BadRequestError({
+					message: 'Please give infor of post',
+				});
 			}
 		}
 		const { filename } = req.file;

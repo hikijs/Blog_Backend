@@ -50,17 +50,15 @@ class AccessService {
 		const exist = await UserQuery.checkUserExist(username, email);
 		// for case db has problem
 		if (exist == null) {
-			throw new BadRequestError(
-				{
-					message: 'Issue in DB when register'
-				});
+			throw new BadRequestError({
+				message: 'Issue in DB when register',
+			});
 		}
 		// check existing
 		if (exist == true) {
-			throw new BadRequestError(
-				{
-					message: 'username or email exist'
-				});
+			throw new BadRequestError({
+				message: 'username or email exist',
+			});
 		}
 
 		const passwordHashed = await bcrypt.hash(password, 10);
@@ -101,11 +99,9 @@ class AccessService {
 			};
 		} catch (error) {
 			await TransactionQuery.rollBackTransaction();
-			throw new BadRequestError(
-				{
-					message: 'Error: Issue when create new user and keystore'
-				}
-			);
+			throw new BadRequestError({
+				message: 'Error: Issue when create new user and keystore',
+			});
 		}
 	};
 
@@ -121,23 +117,20 @@ class AccessService {
 		const userInstance = await UserQuery.getUserName(username);
 		// for case db has problem
 		if (userInstance == null) {
-			throw new BadRequestError(
-				{
-					message: 'Issue in DB when register'
-				});
+			throw new BadRequestError({
+				message: 'Issue in DB when register',
+			});
 		}
 		if (password == undefined) {
-			throw new BadRequestError(
-				{
-					message: 'Please provide more information'
-				});
+			throw new BadRequestError({
+				message: 'Please provide more information',
+			});
 		}
 		const match = await bcrypt.compare(password, userInstance.password);
 		if (!match) {
-			throw new AuthFailureError(
-				{
-					message:'Authentication Failed'
-				});
+			throw new AuthFailureError({
+				message: 'Authentication Failed',
+			});
 		}
 
 		const publicKey = crypto.randomBytes(64).toString('hex');
@@ -267,10 +260,9 @@ class AccessService {
 			} catch (error) {
 				console.log(error);
 				await TransactionQuery.rollBackTransaction();
-				throw new BadRequestError(
-					{
-						message: 'Issue when create new user and keystore'
-					});
+				throw new BadRequestError({
+					message: 'Issue when create new user and keystore',
+				});
 			}
 		} catch (error) {
 			console.log(error);
@@ -417,11 +409,9 @@ class AccessService {
 			} catch (error) {
 				console.log(error);
 				await TransactionQuery.rollBackTransaction();
-				throw new BadRequestError(
-					{
-						message: 'Issue when create new user and keystore'
-					}
-				);
+				throw new BadRequestError({
+					message: 'Issue when create new user and keystore',
+				});
 			}
 		} catch (error) {
 			console.log(error);
@@ -542,11 +532,9 @@ class AccessService {
 			} catch (error) {
 				console.log(error);
 				await TransactionQuery.rollBackTransaction();
-				throw new BadRequestError(
-					{
-						message: 'Issue when create new user and keystore'
-					}
-				);
+				throw new BadRequestError({
+					message: 'Issue when create new user and keystore',
+				});
 			}
 		} catch (error) {
 			console.log(error);
@@ -558,18 +546,16 @@ class AccessService {
 		//1. check mail exist or not in body
 		const email = req.body.email;
 		if (!email) {
-			throw new BadRequestError(
-				{
-					message:'Please Fill Email'
-				});
+			throw new BadRequestError({
+				message: 'Please Fill Email',
+			});
 		}
 		//2. check mail exist or not in the db
 		const userExist = await UserQuery.getNonOauthUserByMail(email);
 		if (!userExist) {
-			throw new BadRequestError(
-				{
-					message:'The email does not register yet'
-				});
+			throw new BadRequestError({
+				message: 'The email does not register yet',
+			});
 		}
 		//3. create new token
 		// Generate a unique token
@@ -603,10 +589,9 @@ class AccessService {
 		if (existingCode != null) {
 			createCookiesVerifyCode(res, code);
 		} else {
-			throw new BadRequestError(
-				{
-					message:'Incorrect Code Please Fill Again'
-				});
+			throw new BadRequestError({
+				message: 'Incorrect Code Please Fill Again',
+			});
 		}
 
 		return { metaData };
@@ -618,17 +603,15 @@ class AccessService {
 		const verifyCode = req.cookies.verifyCode;
 		const { newPassword, confirmPassword } = req.body;
 		if (!newPassword || !confirmPassword) {
-			throw new BadRequestError(
-				{
-					message:'Not enough information request'
-				});
+			throw new BadRequestError({
+				message: 'Not enough information request',
+			});
 		}
 		// check password new and confirm matched
 		if (newPassword !== confirmPassword) {
-			throw new BadRequestError(
-				{
-					message:'Both Password does not match together'
-				});
+			throw new BadRequestError({
+				message: 'Both Password does not match together',
+			});
 		}
 
 		const passwordHashed = await bcrypt.hash(newPassword, 10);
@@ -640,10 +623,9 @@ class AccessService {
 				VERIFYCODE_TYPE.FORGOT_PASSWORD
 			);
 		} catch (error) {
-			throw new BadRequestError(
-				{
-					message:'Update password is not successful'
-				});
+			throw new BadRequestError({
+				message: 'Update password is not successful',
+			});
 		}
 		createCookiesResetPasswordSuccess(res);
 		return 'Update Password Success';
