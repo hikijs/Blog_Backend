@@ -12,6 +12,14 @@ class UploadController {
 	};
 
 	// eslint-disable-next-line no-unused-vars
+	uploadImageUrl = async (req, res, next) => {
+		new CREATED({
+			message: 'Uploaded a Image By Url Success!',
+			metaData: await UploadService.uploadImageUrl(req),
+		}).send(res);
+	};
+
+	// eslint-disable-next-line no-unused-vars
 	uploadMultipleImage = async (req, res, next) => {
 		new CREATED({
 			message: 'Uploaded Multiple Image Success!',
