@@ -310,10 +310,16 @@ class PostQuery extends QueryBase {
 			ON P.userId = I2.userId and I2.topic='avatar'
 		LEFT JOIN FRIENDSHIPS AS F
 			ON F.userAId = U1.userId AND F.userBId = ?
-		WHERE P.statusEdit = 'publish'
-				AND P.sharePermission IN ('public', 'follower')
-				AND F.userBId = ?
-				OR U1.userId = ?
+		WHERE   (
+			P.statusEdit = 'publish'
+			AND P.sharePermission = 'follower'
+			AND F.userBId = ?
+		)
+		OR (
+			P.statusEdit = 'publish'
+			AND P.sharePermission = 'public'
+		)
+		OR U1.userId = ?
 		ORDER BY P.updated_at DESC;`;
 		const postData = await this.dbInstance.hitQuery(getPostDataQuery, [
 			userId,
@@ -355,10 +361,16 @@ class PostQuery extends QueryBase {
                                 LEFT JOIN IMAGE AS I1 ON P.postId = I1.postId and I1.topic='thumnail'
                                 LEFT JOIN IMAGE AS I2 ON P.userId = I2.userId and I2.topic='avatar'
                                 LEFT JOIN FRIENDSHIPS AS F ON F.userAId = U1.userId AND F.userBId = ?
-                                WHERE P.statusEdit = 'publish'
-                                      AND P.sharePermission IN ('public', 'follower')
-                                      AND F.userBId = ?
-                                      OR U1.userId = ?;`;
+                                WHERE   (
+									P.statusEdit = 'publish'
+									AND P.sharePermission = 'follower'
+									AND F.userBId = ?
+								)
+								OR (
+									P.statusEdit = 'publish'
+									AND P.sharePermission = 'public'
+								)
+								OR U1.userId = ?;`;
 			const result = await this.dbInstance.hitQuery(numsPostQuery, [
 				userId,
 				userId,
