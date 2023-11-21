@@ -17,7 +17,7 @@ class UploadService {
 			throw new BadRequestError({
 				message: 'Please give correct topic',
 			});
-		} else if (topic == 'thumnail' && !postId) {
+		} else if ((topic == 'thumnail' || topic == 'content') && !postId) {
 			{
 				throw new BadRequestError({
 					message: 'Please give infor of post',
@@ -33,10 +33,6 @@ class UploadService {
 		return blobLink;
 	};
 
-	// FIXME
-	// if move url image from content to thumbnail that lead to in the future when
-	// query the list image of the content will miss the once which was converted
-	// to thumbnail
 	static uploadImageUrl = async (req) => {
 		let userId = req.cookies.userId;
 		let { topic, postId } = req.query;
@@ -55,7 +51,7 @@ class UploadService {
 			throw new BadRequestError({
 				message: 'Please give correct topic',
 			});
-		} else if (topic == 'thumnail' && !postId) {
+		} else if ((topic == 'thumnail' || topic == 'content') && !postId) {
 			{
 				throw new BadRequestError({
 					message: 'Please give infor of post',
