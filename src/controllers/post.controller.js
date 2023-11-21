@@ -15,7 +15,7 @@ class PostController {
 
 	// eslint-disable-next-line no-unused-vars
 	getCategroryList = async (req, res, next) => {
-		const metaData = await PostService.getCategroryList(req);
+		const metaData = await PostService.getCategoryArray(req);
 		const msg = new OK({
 			message: 'Get List Category Success!',
 			metaData: metaData,
