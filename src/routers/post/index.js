@@ -10,7 +10,9 @@ require('dotenv').config();
 
 router.use(authentication);
 
-router.get('/catetogies', asyncHanlder(PostController.getCategoryList));
+router.get('/categrories', asyncHanlder(PostController.getCategroryList));
+router.post('/createCategrory', asyncHanlder(PostController.createCategrory));
+
 router.post('/publish', asyncHanlder(PostController.publishPost));
 router.post(
 	'/publish_v2',

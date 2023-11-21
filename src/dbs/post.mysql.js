@@ -171,7 +171,7 @@ class PostQuery extends QueryBase {
 		}
 	}
 
-	async getCategoryList() {
+	async getCategroryList() {
 		try {
 			const query = 'SELECT categroryName FROM CATEGORY';
 			const listCategrory = await this.dbInstance.hitQuery(query);
@@ -180,6 +180,22 @@ class PostQuery extends QueryBase {
 			console.error(error);
 			throw new BadRequestError({
 				message: 'Issue happen when getting categrory',
+			});
+		}
+	}
+
+	async createCategory(categroryName) {
+		try {
+			const query = `INSERT INTO CATEGORY (categroryId, categroryName) 
+			               VALUES ( UUID(), ? )`;
+			const createResult = await this.dbInstance.hitQuery(query, [
+				categroryName,
+			]);
+			return createResult;
+		} catch (error) {
+			console.error(error);
+			throw new BadRequestError({
+				message: 'Issue happen when create new categrory',
 			});
 		}
 	}
@@ -347,8 +363,8 @@ class PostQuery extends QueryBase {
 		}
 	}
 
-	// FIXME I think getCategory should not is the method of the class
-	async getCategory(categroryName) {
+	// FIXME I think getCategrory should not is the method of the class
+	async getCategrory(categroryName) {
 		try {
 			const query = 'SELECT * FROM CATEGORY WHERE categroryName = ? ';
 			const result = await this.dbInstance.hitQuery(query, [

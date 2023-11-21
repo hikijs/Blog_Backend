@@ -60,7 +60,7 @@ class PostService {
 			});
 		}
 
-		const categoryData = await PostQuery.getCategory(postCategory);
+		const categoryData = await PostQuery.getCategrory(postCategory);
 		if (categoryData == null) {
 			throw new BadRequestError({
 				message: 'Category name is invalid',
@@ -84,8 +84,18 @@ class PostService {
 	};
 
 	// eslint-disable-next-line no-unused-vars
-	static getCategoryList = async (req) => {
-		return await PostQuery.getCategoryList();
+	static getCategroryList = async (req) => {
+		return await PostQuery.getCategroryList();
+	};
+
+	static createCategrory = async (req) => {
+		const { categroryName } = req.body;
+		if (!categroryName) {
+			throw BadRequestError({
+				message: 'Please Give Name Of New Categrory',
+			});
+		}
+		return await PostQuery.createCategory(categroryName.toLowerCase());
 	};
 
 	static publishPostWithThumbnail = async (req) => {
@@ -117,7 +127,7 @@ class PostService {
 			});
 		}
 
-		const categoryData = await PostQuery.getCategory(postCategory);
+		const categoryData = await PostQuery.getCategrory(postCategory);
 		if (categoryData == null) {
 			throw new BadRequestError({
 				message: 'Category name is invalid',
@@ -217,7 +227,7 @@ class PostService {
 		// is good for case one to one.
 		var categroryId = null;
 		// if (categroryName) {
-		// 	const existingCategory = await PostQuery.getCategory(categroryName);
+		// 	const existingCategory = await PostQuery.getCategrory(categroryName);
 		// 	if (existingCategory == null) {
 		// 		throw new BadRequestError({
 		// 			message: 'The category does not exist',
