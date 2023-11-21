@@ -14,10 +14,20 @@ class PostController {
 	};
 
 	// eslint-disable-next-line no-unused-vars
-	getCategoryList = async (req, res, next) => {
-		const metaData = await PostService.getCategoryList(req);
+	getCategroryList = async (req, res, next) => {
+		const metaData = await PostService.getCategroryList(req);
 		const msg = new OK({
 			message: 'Get List Category Success!',
+			metaData: metaData,
+		});
+		msg.send(res);
+	};
+
+	// eslint-disable-next-line no-unused-vars
+	createCategrory = async (req, res, next) => {
+		const metaData = await PostService.createCategrory(req);
+		const msg = new OK({
+			message: 'Create Categrogy Success!',
 			metaData: metaData,
 		});
 		msg.send(res);
