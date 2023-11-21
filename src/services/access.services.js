@@ -118,7 +118,7 @@ class AccessService {
 		// for case db has problem
 		if (userInstance == null) {
 			throw new BadRequestError({
-				message: 'Issue in DB when register',
+				message: 'The Credential Provided Is Invalid',
 			});
 		}
 		if (password == undefined) {

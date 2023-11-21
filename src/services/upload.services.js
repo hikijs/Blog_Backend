@@ -17,7 +17,7 @@ class UploadService {
 			throw new BadRequestError({
 				message: 'Please give correct topic',
 			});
-		} else if (topic == 'thumnail' && !postId) {
+		} else if ((topic == 'thumnail' || topic == 'content') && !postId) {
 			{
 				throw new BadRequestError({
 					message: 'Please give infor of post',
@@ -31,6 +31,35 @@ class UploadService {
 			req.protocol + '://' + req.get('host') + '/images/' + filename;
 		await ImageData.insertImageToDb(blobLink, topic, userId, postId);
 		return blobLink;
+	};
+
+	static uploadImageUrl = async (req) => {
+		let userId = req.cookies.userId;
+		let { topic, postId } = req.query;
+		let { url } = req.body;
+		if (!userId) {
+			throw new AuthFailureError({
+				message: 'Please verify your authentication',
+			});
+		}
+		if (!url) {
+			throw new BadRequestError({
+				message: 'Please Giving The Image Url',
+			});
+		}
+		if (!AVATAR_TOPIC.includes(topic)) {
+			throw new BadRequestError({
+				message: 'Please give correct topic',
+			});
+		} else if ((topic == 'thumnail' || topic == 'content') && !postId) {
+			{
+				throw new BadRequestError({
+					message: 'Please give infor of post',
+				});
+			}
+		}
+		await ImageData.insertImageToDb(url, topic, userId, postId);
+		return url;
 	};
 
 	static uploadMultipleImage = async (req) => {
