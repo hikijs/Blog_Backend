@@ -16,7 +16,7 @@ class PostSummarizeContent {
 			userName,
 			avatarUrl,
 			thumbnailUrl,
-			categroryNames,
+			categoryNames,
 			statusEdit,
 			sharePermission,
 		} = postData;
@@ -30,7 +30,7 @@ class PostSummarizeContent {
 		this.userName = userName;
 		this.avatarUrl = avatarUrl;
 		this.thumbnailUrl = thumbnailUrl;
-		this.categroryNames = categroryNames.split(',');
+		this.categoryNames = categoryNames.split(',');
 		this.statusEdit = statusEdit;
 		this.sharePermission = sharePermission;
 	}
@@ -44,7 +44,7 @@ class PostSummarizeContent {
 			thumbnailUrl,
 			created_at,
 			updated_at,
-			categroryNames,
+			categoryNames,
 			statusEdit,
 			sharePermission,
 		} = this;
@@ -63,7 +63,7 @@ class PostSummarizeContent {
 				statusEdit,
 				sharePermission,
 				thumbnail: thumbnailUrl,
-				categroryNames,
+				categoryNames,
 				created_at,
 				updated_at,
 			},
@@ -263,6 +263,7 @@ class PostQuery extends QueryBase {
 					ORDER BY
 					P.created_at DESC;`;
 		const postData = await this.dbInstance.hitQuery(getPost, [userId]);
+		console.log(postData);
 		if (postData.length == numberPosts) {
 			let postSummarizeContents = [];
 			let index = 0;
