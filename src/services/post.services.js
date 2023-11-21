@@ -117,7 +117,6 @@ class PostService {
 			});
 		}
 
-
 		const categoryData = await PostQuery.getCategory(postCategory);
 		if (categoryData == null) {
 			throw new BadRequestError({
@@ -211,7 +210,8 @@ class PostService {
 				message: `post with id ${postId} did not exist`,
 			});
 		}
-		const { title, statusEdit, sharePermission, summarize, content } = req.body;
+		const { title, statusEdit, sharePermission, summarize, content } =
+			req.body;
 		// FIXME: till know please dont update categoryName because this have many issues
 		// because in the initial the design db is many to many for category and post but the logic know
 		// is good for case one to one.
@@ -231,7 +231,7 @@ class PostService {
 			statusEdit: statusEdit,
 			sharePermission: sharePermission,
 			summarize: summarize,
-			content: content
+			content: content,
 		};
 		try {
 			await PostQuery.updatePost(queriesData, postId, categroryId);

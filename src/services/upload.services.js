@@ -34,7 +34,7 @@ class UploadService {
 	};
 
 	// FIXME
-	// if move url image from content to thumbnail that lead to in the future when 
+	// if move url image from content to thumbnail that lead to in the future when
 	// query the list image of the content will miss the once which was converted
 	// to thumbnail
 	static uploadImageUrl = async (req) => {
