@@ -36,11 +36,11 @@ CREATE TABLE IF NOT EXISTS CATEGORY(categroryId CHAR(36),
 -- Insert category names into the CATEGORY table with UUIDs
 INSERT IGNORE INTO CATEGORY (categroryId, categroryName)
 VALUES
-    (UUID(), 'Technologies'),
-    (UUID(), 'Food'),
-    (UUID(), 'Travel'),
-    (UUID(), 'Sport'),
-    (UUID(), 'Others');
+    (UUID(), 'technologies'),
+    (UUID(), 'food'),
+    (UUID(), 'travel'),
+    (UUID(), 'sport'),
+    (UUID(), 'others');
 
 -- 4 create tag table
 CREATE TABLE IF NOT EXISTS TAG(tagId CHAR(36),

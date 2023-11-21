@@ -16,7 +16,7 @@ class PostSummarizeContent {
 			userName,
 			avatarUrl,
 			thumbnailUrl,
-			categroryName,
+			categroryNames,
 			statusEdit,
 			sharePermission,
 		} = postData;
@@ -30,7 +30,7 @@ class PostSummarizeContent {
 		this.userName = userName;
 		this.avatarUrl = avatarUrl;
 		this.thumbnailUrl = thumbnailUrl;
-		this.categroryName = categroryName;
+		this.categroryNames = categroryNames.split(',');
 		this.statusEdit = statusEdit;
 		this.sharePermission = sharePermission;
 	}
@@ -44,7 +44,7 @@ class PostSummarizeContent {
 			thumbnailUrl,
 			created_at,
 			updated_at,
-			categroryName,
+			categroryNames,
 			statusEdit,
 			sharePermission,
 		} = this;
@@ -63,7 +63,7 @@ class PostSummarizeContent {
 				statusEdit,
 				sharePermission,
 				thumbnail: thumbnailUrl,
-				categroryName,
+				categroryNames,
 				created_at,
 				updated_at,
 			},
@@ -80,8 +80,7 @@ class PostQuery extends QueryBase {
 		sharePermit,
 		summarize,
 		content,
-		userId,
-		categoryId
+		userId
 	) {
 		try {
 			const postId = uuidv4();
@@ -98,7 +97,6 @@ class PostQuery extends QueryBase {
 				content,
 				userId,
 			]);
-			await this.updatePostCategoryTable(postId, categoryId);
 			return postId;
 		} catch (error) {
 			console.log(error);
@@ -125,11 +123,10 @@ class PostQuery extends QueryBase {
 		}
 	}
 
-	async updatePost(queriesData, postId, categroryId) {
+	async updatePost(queriesData, postId) {
 		const { query, queryParams } =
 			SqlBuilder.dynamicSqlForUpdatePostByPostId(queriesData, postId);
 		await this.dbInstance.hitQuery(query, queryParams);
-		await this.updatePostCategoryTable(postId, categroryId);
 	}
 
 	async deletePost(postId) {
@@ -144,24 +141,23 @@ class PostQuery extends QueryBase {
 
 	async getPostByPostId(postId) {
 		try {
+			// Get post infor without categrory
 			const getPost = ` SELECT  U.userId, U.userName, I1.imageUrl as avatarUrl,
                                   P.postId, I2.imageUrl as thumbnailUrl, P.title,
-                                  C.categroryName, P.statusEdit, P.sharePermission, P.summarize, P.content, P.created_at, P.updated_at
+                                  P.statusEdit, P.sharePermission, P.summarize, P.content, P.created_at, P.updated_at
                           FROM POST P
                           INNER JOIN USER U
-                          ON P.userId = U.userId
+                          	ON P.userId = U.userId
                           LEFT JOIN IMAGE I1
-                          ON I1.userId = P.userId AND I1.topic = 'avatar'
+                          	ON I1.userId = P.userId AND I1.topic = 'avatar'
                           LEFT JOIN IMAGE I2
-                          ON I2.postId = P.postId AND I2.topic = 'thumnail'
-                          INNER JOIN POSTCATEGORY PS
-                          ON PS.postId = P.postId
-                          INNER JOIN CATEGORY C
-                          ON C.categroryId = PS.categroryId
+                          	ON I2.postId = P.postId AND I2.topic = 'thumnail'
                           WHERE P.postId  = ?;`;
 			const postData = await this.dbInstance.hitQuery(getPost, [postId]);
+			// get list categrory of by postId
+			const categrogiesData = await this.getCategroryListByPostId(postId);
 			if (postData.length == 1) {
-				return postData[0];
+				return { ...postData[0], categrogies: categrogiesData };
 			} else {
 				return null;
 			}
@@ -171,7 +167,7 @@ class PostQuery extends QueryBase {
 		}
 	}
 
-	async getCategoryList() {
+	async getCategroryList() {
 		try {
 			const query = 'SELECT categroryName FROM CATEGORY';
 			const listCategrory = await this.dbInstance.hitQuery(query);
@@ -184,12 +180,66 @@ class PostQuery extends QueryBase {
 		}
 	}
 
+	async getCategroryListByPostId(postId) {
+		try {
+			const query = `SELECT C.categroryName
+						FROM POSTCATEGORY PC
+						INNER JOIN CATEGORY C
+						ON PC.categroryId = C.categroryId
+						WHERE postId = ?`;
+			const listCategrory = await this.dbInstance.hitQuery(query, [
+				postId,
+			]);
+			return listCategrory.map((category) => category.categroryName);
+		} catch (error) {
+			console.error(error);
+			throw new BadRequestError({
+				message: 'Issue happen when getting post categrogies',
+			});
+		}
+	}
+
+	async createCategory(categroryName) {
+		try {
+			const query = `INSERT INTO CATEGORY (categroryId, categroryName) 
+			               VALUES ( UUID(), ? )`;
+			const createResult = await this.dbInstance.hitQuery(query, [
+				categroryName,
+			]);
+			return createResult;
+		} catch (error) {
+			console.error(error);
+			throw new BadRequestError({
+				message: 'Issue happen when create new categrory',
+			});
+		}
+	}
+
+	async createTempTablePostWithListCategrory() {
+		//Note: temporary table existence on same db connection only
+		const joinPostWithCategrory = `
+		CREATE TEMPORARY TABLE POST_AND_CATEGRORIES AS
+			SELECT
+				P.postId,
+				GROUP_CONCAT(C.categroryName) AS categoryNames
+			FROM
+				POSTCATEGORY AS PC
+			JOIN
+				POST AS P ON PC.postId = P.postId
+			JOIN
+				CATEGORY AS C ON PC.categroryId = C.categroryId
+			GROUP BY
+				P.postId;`;
+		await this.dbInstance.hitQuery(joinPostWithCategrory);
+	}
+
 	async getPostByUserId(userId, numberPosts) {
+		await this.createTempTablePostWithListCategrory();
 		const getPost = `SELECT
 						P.postId,
 						I1.imageUrl AS thumbnailUrl,
 						P.title,
-						C.categroryName,
+						PAC.categoryNames,
 						P.statusEdit,
 						P.sharePermission,
 						P.summarize,
@@ -199,17 +249,15 @@ class PostQuery extends QueryBase {
 						U.userName,
 						I2.imageUrl AS avatarUrl
 					FROM
-						POST P
+						POST_AND_CATEGRORIES PAC
+					INNER JOIN POST P 
+						ON P.postId = PAC.postId
 					JOIN USER U
-					ON P.userId = U.userId
+					    ON P.userId = U.userId
 					LEFT JOIN IMAGE I1
 						ON U.userId = I1.postId AND I1.topic = 'thumnail'
 					LEFT JOIN IMAGE I2
 						ON P.postId = I2.userId AND I2.topic = 'avatar'
-					INNER JOIN POSTCATEGORY PS
-						ON PS.postId = P.postId
-					INNER JOIN CATEGORY C
-						ON C.categroryId = PS.categroryId
 					WHERE
 						P.userId = ?
 					ORDER BY
@@ -235,33 +283,38 @@ class PostQuery extends QueryBase {
 	}
 
 	async getPostByUserIdV2(userId, numberPosts) {
-		const getPost = `SELECT P.postId,
-							I1.imageUrl AS thumbnailUrl,
-							P.title,
-							C.categroryName,
-							P.statusEdit,
-							P.sharePermission,
-							P.summarize,
-							P.created_at,
-							P.updated_at,
-							U1.userId,
-							U1.userName,
-							I2.imageUrl AS avatarUrl
-						FROM POST P 
-						LEFT JOIN USER AS U1 ON U1.userId = P.userId
-						LEFT JOIN IMAGE AS I1 ON P.postId = I1.postId and I1.topic='thumnail'
-						LEFT JOIN IMAGE AS I2 ON P.userId = I2.userId and I2.topic='avatar'
-						LEFT JOIN FRIENDSHIPS AS F ON F.userAId = U1.userId AND F.userBId = ?
-						INNER JOIN POSTCATEGORY PS
-						ON PS.postId = P.postId
-						INNER JOIN CATEGORY C
-						ON C.categroryId = PS.categroryId
-						WHERE P.statusEdit = 'publish'
-							AND P.sharePermission IN ('public', 'follower')
-							AND F.userBId = ?
-							OR U1.userId = ?
-						ORDER BY P.updated_at DESC;`;
-		const postData = await this.dbInstance.hitQuery(getPost, [
+		await this.createTempTablePostWithListCategrory();
+		const getPostDataQuery = `SELECT
+		  P.postId,
+		  I1.imageUrl AS thumbnailUrl,
+		  P.title,
+		  PAC.categoryNames,
+		  P.statusEdit,
+		  P.sharePermission,
+		  P.summarize,
+		  P.created_at,
+		  P.updated_at,
+		  U1.userId,
+		  U1.userName,
+		  I2.imageUrl AS avatarUrl
+		FROM
+			POST_AND_CATEGRORIES PAC
+		INNER JOIN POST P 
+			ON P.postId = PAC.postId
+		LEFT JOIN USER AS U1
+			ON U1.userId = P.userId
+		LEFT JOIN IMAGE AS I1
+			ON P.postId = I1.postId and I1.topic='thumnail'
+		LEFT JOIN IMAGE AS I2
+			ON P.userId = I2.userId and I2.topic='avatar'
+		LEFT JOIN FRIENDSHIPS AS F
+			ON F.userAId = U1.userId AND F.userBId = ?
+		WHERE P.statusEdit = 'publish'
+				AND P.sharePermission IN ('public', 'follower')
+				AND F.userBId = ?
+				OR U1.userId = ?
+		ORDER BY P.updated_at DESC;`;
+		const postData = await this.dbInstance.hitQuery(getPostDataQuery, [
 			userId,
 			userId,
 			userId,
@@ -347,8 +400,8 @@ class PostQuery extends QueryBase {
 		}
 	}
 
-	// FIXME I think getCategory should not is the method of the class
-	async getCategory(categroryName) {
+	// FIXME I think getCategrory should not is the method of the class
+	async getCategrory(categroryName) {
 		try {
 			const query = 'SELECT * FROM CATEGORY WHERE categroryName = ? ';
 			const result = await this.dbInstance.hitQuery(query, [
@@ -515,6 +568,32 @@ class PostQuery extends QueryBase {
 			console.log(error);
 			return null;
 		}
+	}
+
+	async updateCategoryForPost(categroryList, postId) {
+		for (const categroryName of categroryList) {
+			const categoryData = await this.getCategrory(
+				categroryName.toLowerCase()
+			);
+			if (categoryData == null) {
+				throw new BadRequestError({
+					message: 'Please Double Check Your Category Name',
+				});
+			}
+			await this.updatePostCategoryTable(
+				postId,
+				categoryData.categroryId
+			);
+		}
+	}
+
+	async clearAllCategroryForPost(postId) {
+		const deleteAllCategrory = 'DELETE FROM POSTCATEGORY WHERE postId = ?';
+		const deleteResult = await this.dbInstance.hitQuery(
+			deleteAllCategrory,
+			[postId]
+		);
+		return deleteResult;
 	}
 }
 
