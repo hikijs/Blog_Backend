@@ -17,6 +17,12 @@ router.post(
 	imageUpload.single('image'),
 	asyncHanlder(UploadController.uploadSingleImage)
 );
+
+router.post(
+	'/imageUrl',
+	asyncHanlder(UploadController.uploadImageUrl)
+);
+
 router.post(
 	'/images',
 	imageUpload.array('images'),
