@@ -93,6 +93,14 @@ class PostService {
 		return await PostQuery.getCategroryList();
 	};
 
+	// eslint-disable-next-line no-unused-vars
+	static getCategoryArray = async (req) => {
+		const listCategory = await PostQuery.getCategroryList();
+		return {
+			categories: listCategory.map((element) =>  element.categroryName)
+		};
+	};
+
 	static createCategrory = async (req) => {
 		const { categroryName } = req.body;
 		if (!categroryName) {
