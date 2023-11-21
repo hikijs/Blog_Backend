@@ -144,9 +144,10 @@ class PostQuery extends QueryBase {
 
 	async getPostByPostId(postId) {
 		try {
+			// Get post infor without categrory
 			const getPost = ` SELECT  U.userId, U.userName, I1.imageUrl as avatarUrl,
                                   P.postId, I2.imageUrl as thumbnailUrl, P.title,
-                                  C.categroryName, P.statusEdit, P.sharePermission, P.summarize, P.content, P.created_at, P.updated_at
+                                  P.statusEdit, P.sharePermission, P.summarize, P.content, P.created_at, P.updated_at
                           FROM POST P
                           INNER JOIN USER U
                           ON P.userId = U.userId
@@ -154,14 +155,13 @@ class PostQuery extends QueryBase {
                           ON I1.userId = P.userId AND I1.topic = 'avatar'
                           LEFT JOIN IMAGE I2
                           ON I2.postId = P.postId AND I2.topic = 'thumnail'
-                          INNER JOIN POSTCATEGORY PS
-                          ON PS.postId = P.postId
-                          INNER JOIN CATEGORY C
-                          ON C.categroryId = PS.categroryId
                           WHERE P.postId  = ?;`;
 			const postData = await this.dbInstance.hitQuery(getPost, [postId]);
+			// get list categrory of by postId
+			const categrogiesData = await this.getCategroryListByPostId(postId);
 			if (postData.length == 1) {
-				return postData[0];
+				return {...postData[0],
+						categrogies: categrogiesData};
 			} else {
 				return null;
 			}
@@ -180,6 +180,23 @@ class PostQuery extends QueryBase {
 			console.error(error);
 			throw new BadRequestError({
 				message: 'Issue happen when getting categrory',
+			});
+		}
+	}
+
+	async getCategroryListByPostId(postId) {
+		try {
+			const query = `SELECT C.categroryName
+						FROM POSTCATEGORY PC
+						INNER JOIN CATEGORY C
+						ON PC.categroryId = C.categroryId
+						WHERE postId = ?`;
+			const listCategrory = await this.dbInstance.hitQuery(query, [postId]);
+			return listCategrory.map(category => category.categroryName);;
+		} catch (error) {
+			console.error(error);
+			throw new BadRequestError({
+				message: 'Issue happen when getting post categrogies',
 			});
 		}
 	}
