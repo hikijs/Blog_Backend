@@ -38,6 +38,7 @@ class PostService {
 			});
 		}
 	}
+
 	static publishPost = async (req) => {
 		const userId = req.cookies.userId;
 		const postTitle = req.body[POST_BODY.POST_TITLE];
@@ -60,27 +61,31 @@ class PostService {
 			});
 		}
 
-		const categoryData = await PostQuery.getCategrory(postCategory);
-		if (categoryData == null) {
+		await TransactionQuery.startTransaction();
+		try {
+			const postIdNew = await PostQuery.insertPostToDb(
+				postTitle,
+				postStatus,
+				postPermit,
+				postSummarize,
+				postContent,
+				userId
+			);
+			if (postIdNew == null) {
+				throw new BadRequestError({
+					message: 'Can Not Create New Post',
+				});
+			}
+			await PostQuery.updateCategoryForPost(postCategory, postIdNew);
+			await TransactionQuery.commitTransaction();
+
+			return { newPostId: postIdNew };
+		} catch (error) {
+			await TransactionQuery.rollBackTransaction();
 			throw new BadRequestError({
-				message: 'Category name is invalid',
+				message: error,
 			});
 		}
-		const postIdNew = await PostQuery.insertPostToDb(
-			postTitle,
-			postStatus,
-			postPermit,
-			postSummarize,
-			postContent,
-			userId,
-			categoryData.categroryId
-		);
-		if (postIdNew == null) {
-			throw new BadRequestError({
-				message: 'Can Not Create New Post',
-			});
-		}
-		return { newPostId: postIdNew };
 	};
 
 	// eslint-disable-next-line no-unused-vars
@@ -127,12 +132,6 @@ class PostService {
 			});
 		}
 
-		const categoryData = await PostQuery.getCategrory(postCategory);
-		if (categoryData == null) {
-			throw new BadRequestError({
-				message: 'Category name is invalid',
-			});
-		}
 		await TransactionQuery.startTransaction();
 		try {
 			const postIdNew = await PostQuery.insertPostToDb(
@@ -141,12 +140,13 @@ class PostService {
 				postPermit,
 				postSummarize,
 				postContent,
-				userId,
-				categoryData.categroryId
+				userId
 			);
 			if (!postIdNew) {
 				throw new Error('PostId is null');
 			}
+			await PostQuery.updateCategoryForPost(postCategory, postIdNew);
+
 			const blobLink =
 				req.protocol + '://' + req.get('host') + '/images/' + filename;
 			await ImageData.upSertImage(
@@ -159,9 +159,8 @@ class PostService {
 			return { newPostId: postIdNew, thumbnail: blobLink };
 		} catch (error) {
 			await TransactionQuery.rollBackTransaction();
-			console.log(error);
 			throw new BadRequestError({
-				message: 'Issue when create new post with thumbnail',
+				message: error,
 			});
 		}
 	};
@@ -209,6 +208,8 @@ class PostService {
 
 	static editPost = async (req) => {
 		const postId = req.params.postId;
+		const userId = req.cookies.userId;
+
 		if (!postId) {
 			throw new BadRequestError({
 				message: 'Please give more infor',
@@ -220,37 +221,43 @@ class PostService {
 				message: `post with id ${postId} did not exist`,
 			});
 		}
-		const { title, statusEdit, sharePermission, summarize, content } =
-			req.body;
-		// FIXME: till know please dont update categoryName because this have many issues
-		// because in the initial the design db is many to many for category and post but the logic know
-		// is good for case one to one.
-		var categroryId = null;
-		// if (categroryName) {
-		// 	const existingCategory = await PostQuery.getCategrory(categroryName);
-		// 	if (existingCategory == null) {
-		// 		throw new BadRequestError({
-		// 			message: 'The category does not exist',
-		// 		});
-		// 	} else {
-		// 		categroryId = existingCategory.categroryId;
-		// 	}
-		// }
-		const queriesData = {
-			title: title,
-			statusEdit: statusEdit,
-			sharePermission: sharePermission,
-			summarize: summarize,
-			content: content,
-		};
+		// check if the current user own this post
+		if (userId != postData.userId) {
+			throw new BadRequestError({
+				message: 'User Does Not Have Permission To Edit Post',
+			});
+		}
+		const {
+			title,
+			statusEdit,
+			sharePermission,
+			summarize,
+			content,
+			categrories,
+		} = req.body;
+		await TransactionQuery.startTransaction();
 		try {
-			await PostQuery.updatePost(queriesData, postId, categroryId);
+			const queriesData = {
+				title: title,
+				statusEdit: statusEdit,
+				sharePermission: sharePermission,
+				summarize: summarize,
+				content: content,
+			};
+			await PostQuery.updatePost(queriesData, postId);
+			console.log(categrories);
+			if (categrories != null && categrories.length > 0) {
+				await PostQuery.clearAllCategroryForPost(postId);
+				await PostQuery.updateCategoryForPost(categrories, postId);
+			}
+			await TransactionQuery.commitTransaction();
+			return { metaData: {} };
 		} catch (error) {
+			await TransactionQuery.rollBackTransaction();
 			throw new BadRequestError({
 				message: error,
 			});
 		}
-		return { metaData: {} };
 	};
 
 	static deletePost = async (req) => {
@@ -426,17 +433,23 @@ class PostService {
 				message: 'Not Enough Info',
 			});
 		}
+		await TransactionQuery.startTransaction();
+
 		try {
 			const numberPosts = await PostQuery.getNumberPostOfUser(userId);
 			const listPost = await PostQuery.getPostByUserId(
 				userId,
 				numberPosts
 			);
+			await TransactionQuery.commitTransaction();
+
 			return {
 				numberPosts: numberPosts,
 				listPost: listPost,
 			};
 		} catch (error) {
+			console.log(error);
+			await TransactionQuery.rollBackTransaction();
 			throw new InternalError({
 				message: 'Internal Server Error When Getting My Posts',
 				internalCode: InternalCode.NOT_FOUND,
@@ -451,6 +464,7 @@ class PostService {
 				message: 'Not Enough Info',
 			});
 		}
+		await TransactionQuery.startTransaction();
 		try {
 			const numberPosts =
 				await PostQuery.getNumberPostFollowedByUser(userId);
@@ -458,11 +472,13 @@ class PostService {
 				userId,
 				numberPosts
 			);
+			await TransactionQuery.commitTransaction();
 			return {
 				numberPosts: numberPosts,
 				listPost: listPost,
 			};
 		} catch (error) {
+			await TransactionQuery.rollBackTransaction();
 			throw new InternalError({
 				message: 'Internal Server Error When Getting All Posts',
 				internalCode: InternalCode.NOT_FOUND,
