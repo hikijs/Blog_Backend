@@ -2,13 +2,15 @@ const isPortReachable = require('is-port-reachable');
 const path = require('path');
 const dockerCompose = require('docker-compose');
 const { execSync } = require('child_process');
+require('dotenv').config();
 
 module.exports = async () => {
 	// eslint-disable-next-line no-undef
 	const currentDir = __dirname;
 	console.time('global-setup');
 
-	const isDBReachable = await isPortReachable(3008); //port mysql test
+	// eslint-disable-next-line no-undef
+	const isDBReachable = await isPortReachable(process.env.MYSQL_PORT || 3308); //port mysql test
 	if (!isDBReachable) {
 		// ️️️✅ Best Practice: Start the infrastructure within a test hook - No failures occur because the DB is down
 		// console.log("start docker compose")
