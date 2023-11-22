@@ -97,7 +97,7 @@ class PostService {
 	static getCategoryArray = async (req) => {
 		const listCategory = await PostQuery.getCategroryList();
 		return {
-			categories: listCategory.map((element) =>  element.categroryName)
+			categories: listCategory.map((element) => element.categroryName),
 		};
 	};
 
