@@ -114,16 +114,21 @@ class AccessService {
     */
 	static login = async (req, res) => {
 		const { username, email, password } = req.body;
-		const userInstance = await UserQuery.getUserName(username);
-		// for case db has problem
+		if (password == undefined || !((email == null) ^ (username == null))) {
+			throw new BadRequestError({
+				message: 'Please provide username/email and the password',
+			});
+		}
+		let userInstance = null;
+		if (username) {
+			userInstance = await UserQuery.getUserName(username);
+		} else if (email) {
+			userInstance = await UserQuery.getNonOauthUserByMail(email);
+		}
+
 		if (userInstance == null) {
 			throw new BadRequestError({
 				message: 'The Credential Provided Is Invalid',
-			});
-		}
-		if (password == undefined) {
-			throw new BadRequestError({
-				message: 'Please provide more information',
 			});
 		}
 		const match = await bcrypt.compare(password, userInstance.password);
