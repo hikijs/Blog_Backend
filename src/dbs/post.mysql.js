@@ -167,6 +167,24 @@ class PostQuery extends QueryBase {
 		}
 	}
 
+	async getPostThumbnail(postId) {
+		try {
+			const query = ` SELECT *
+							FROM IMAGE WHERE postId = ? AND topic = 'thumnail';`;
+			const thumbnailData = await this.dbInstance.hitQuery(query, [
+				postId,
+			]);
+			if (thumbnailData.length == 1) {
+				return thumbnailData[0];
+			} else {
+				null;
+			}
+		} catch (error) {
+			console.log(error);
+			return null;
+		}
+	}
+
 	async getCategroryList() {
 		try {
 			const query = 'SELECT categroryName FROM CATEGORY';
