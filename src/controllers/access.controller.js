@@ -18,7 +18,7 @@ class AccessController {
 	// eslint-disable-next-line no-unused-vars
 	login = async (req, res, next) => {
 		const { metaData } = await AccessService.login(req, res);
-		new CREATED({
+		new OK({
 			message: 'Login Success!',
 			metaData: metaData,
 		}).send(res);
