@@ -15,7 +15,7 @@ const TYPE_CONNECTION_DB = {
 	single: 'single',
 };
 class Database {
-	constructor(typeConnection = TYPE_CONNECTION_DB.pool) {
+	constructor(typeConnection = TYPE_CONNECTION_DB.single) {
 		this.typeConnection = typeConnection;
 		// txConnection is flag for handling transaction connection
 		this.txConnection = null;
@@ -55,7 +55,7 @@ class Database {
 
 	createNewConnection() {
 		return mysql.createConnection({
-			host: MYSQL_HOST || 'mysql',
+			host: MYSQL_HOST || 'mysql1',
 			user: MYSQL_USER || 'hunghoang',
 			password: MYSQL_PASSWORD || '123',
 			database: MYSQL_DATABASE || 'blog',

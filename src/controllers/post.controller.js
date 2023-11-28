@@ -161,7 +161,7 @@ class PostController {
 
 	// eslint-disable-next-line no-unused-vars
 	getMyPosts = async (req, res, next) => {
-		new CREATED({
+		new OK({
 			message: 'get all post by user id success!',
 			metaData: await PostService.getMyPosts(req),
 		}).send(res);
@@ -169,7 +169,7 @@ class PostController {
 
 	// eslint-disable-next-line no-unused-vars
 	getAllPost = async (req, res, next) => {
-		new CREATED({
+		new OK({
 			message: 'get all posts (friend posts also) success!',
 			metaData: await PostService.getAllPost(req),
 		}).send(res);
