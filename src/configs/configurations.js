@@ -207,6 +207,7 @@ const CONTRAINS_UPDATE_POST = {
 			'sharePermission',
 			'summarize',
 			'content',
+			'categrories',
 		],
 		statusEdit: ['publish', 'unpublish', 'draft'],
 		sharePermission: ['private', 'follower', 'public'],

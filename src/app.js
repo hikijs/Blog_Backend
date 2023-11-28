@@ -77,6 +77,10 @@ const initializeWebServer = () => {
 
 const stopWebServer = () => {
 	return new Promise((resolve, reject) => {
+		if (!connection || connection == undefined) {
+			console.warn('Does not exist Http Connection');
+			resolve();
+		}
 		connection.close((err) => {
 			if (err) {
 				console.error('Error Happen When Close Connection Http Server');

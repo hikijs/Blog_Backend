@@ -243,6 +243,18 @@ class PostService {
 			content,
 			categrories,
 		} = req.body;
+		const isNoChangeProvided =
+			!title &&
+			!statusEdit &&
+			!sharePermission &&
+			!summarize &&
+			!content &&
+			!categrories;
+		if (isNoChangeProvided) {
+			throw new BadRequestError({
+				message: 'Please Provide The Change',
+			});
+		}
 		await TransactionQuery.startTransaction();
 		try {
 			const queriesData = {
@@ -252,9 +264,13 @@ class PostService {
 				summarize: summarize,
 				content: content,
 			};
-			await PostQuery.updatePost(queriesData, postId);
-			console.log(categrories);
-			if (categrories != null && categrories.length > 0) {
+			const allUndefined = Object.values(queriesData).every(
+				(value) => value === undefined
+			);
+			if (!allUndefined) {
+				await PostQuery.updatePost(queriesData, postId);
+			}
+			if (categrories != null && categrories.length >= 0) {
 				await PostQuery.clearAllCategroryForPost(postId);
 				await PostQuery.updateCategoryForPost(categrories, postId);
 			}

@@ -26,7 +26,7 @@ router.get('/read/:postId', asyncHanlder(PostController.readSinglePost));
 // FIXME the categrory can be multiple value, how to edit
 router.put('/edit/:postId', asyncHanlder(PostController.editPost));
 router.delete('/delete/:postId', asyncHanlder(PostController.deletePost));
-router.delete('/delete/posts', asyncHanlder(PostController.deleteAllPost));
+router.delete('/deleteAll/posts', asyncHanlder(PostController.deleteAllPost));
 
 // router.post('/delete/:postId', asyncHanlder(PostController.editComment))
 // FIXME the comment just is basic, in the future hard to development, should spend time refactor

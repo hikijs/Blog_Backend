@@ -4,7 +4,7 @@ const nock = require('nock');
 const { serverStart, serverStop } = require('../mocks/server.mock');
 const UserQuery = require('../../src/dbs/user.mysql');
 const { CONFIGS } = require('../config/config');
-const PostAction = require('./postUtils');
+const PostAction = require('../utils/postUtils');
 const path = require('path');
 const PostQuery = require('../../src/dbs/post.mysql');
 let axiosAPIClient;
