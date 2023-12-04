@@ -55,7 +55,7 @@ class Database {
 
 	createNewConnection() {
 		return mysql.createConnection({
-			host: MYSQL_HOST || 'mysql1',
+			host: MYSQL_HOST || 'mysql',
 			user: MYSQL_USER || 'hunghoang',
 			password: MYSQL_PASSWORD || '123',
 			database: MYSQL_DATABASE || 'blog',
