@@ -38,17 +38,17 @@ class SqlBuilder {
 		const queryParams = [];
 		let query = 'UPDATE POST SET';
 		for (const queryName in queries) {
-			console.log(queryName);
 			const queryData = queries[queryName];
+			if (!queryData) {
+				continue;
+			}
 			if (!validateAttrUpdatePost(queryName, queryData)) {
 				throw new BadRequestError({
 					message: 'The queries data is not correct',
 				});
 			}
-			if (queryData) {
-				query += ` ${queryName} = ?,`;
-				queryParams.push(queryData);
-			}
+			query += ` ${queryName} = ?,`;
+			queryParams.push(queryData);
 		}
 		// Remove the trailing comma from the query
 		query = query.slice(0, -1);

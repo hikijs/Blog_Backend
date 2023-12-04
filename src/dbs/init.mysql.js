@@ -15,7 +15,7 @@ const TYPE_CONNECTION_DB = {
 	single: 'single',
 };
 class Database {
-	constructor(typeConnection = TYPE_CONNECTION_DB.pool) {
+	constructor(typeConnection = TYPE_CONNECTION_DB.single) {
 		this.typeConnection = typeConnection;
 		// txConnection is flag for handling transaction connection
 		this.txConnection = null;
