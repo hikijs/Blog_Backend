@@ -1,7 +1,7 @@
 'use strict';
 const { OK, CREATED } = require('../core/response/apiSuccessResponse');
-
 const PostService = require('../services/post.services');
+const Cache = require('../helpers/caching');
 class PostController {
 	// eslint-disable-next-line no-unused-vars
 	publishPost = async (req, res, next) => {
@@ -161,9 +161,12 @@ class PostController {
 
 	// eslint-disable-next-line no-unused-vars
 	getMyPosts = async (req, res, next) => {
+		const metaData = await Cache(req.originalUrl, async () => {
+			return await PostService.getMyPosts(req);
+		});
 		new OK({
 			message: 'get all post by user id success!',
-			metaData: await PostService.getMyPosts(req),
+			metaData: metaData,
 		}).send(res);
 	};
 
