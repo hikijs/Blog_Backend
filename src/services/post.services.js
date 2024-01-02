@@ -474,7 +474,7 @@ class PostService {
 		} catch (error) {
 			console.log(error);
 			await TransactionQuery.rollBackTransaction();
-			throw new InternalError({
+			throw new BadRequestError({
 				message: 'Internal Server Error When Getting My Posts',
 				internalCode: InternalCode.NOT_FOUND,
 			});

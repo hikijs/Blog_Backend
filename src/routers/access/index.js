@@ -21,7 +21,7 @@ router.post(
 	'/forgot-password/:verifyCode',
 	asyncHanlder(accessController.forgotPasswordVerify)
 );
-router.post('/forgot-password', asyncHanlder(accessController.forgotPassword));
+router.put('/password', asyncHanlder(accessController.forgotPassword));
 router.post(
 	'/reset-password',
 	verifyResetPassword,

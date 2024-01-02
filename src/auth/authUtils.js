@@ -43,39 +43,42 @@ const authentication = asyncHanlder(async (req, res, next) => {
 	const { accessToken, userId } = req.cookies;
 	//1
 	if (!userId) {
-		throw new AuthFailureError({
-			message: 'Invalid request',
-		});
-	}
-	//2
-	const keyStore = await KeyStoreQuery.getKeyStore(userId);
-	//    console.log(`Key store maybe is ${keyStore}`)
-	if (keyStore == null) {
 		throw new BadRequestError({
-			message: 'Not Found KeyStore',
+			message: 'Missing Infor',
 		});
 	}
-	//3
-	if (!accessToken) {
-		throw new AuthFailureError({
-			message: 'Invalid authorization',
+	let keyStore = null;
+	try {
+		keyStore = await KeyStoreQuery.getKeyStore(userId);
+		if (keyStore == null) {
+			throw new BadRequestError({
+				message: 'Missing Infor',
+			});
+		}
+		//3
+		if (!accessToken) {
+			throw new BadRequestError({
+				message: 'Missing AccessToken',
+			});
+		}
+	} catch (error) {
+		throw new BadRequestError({
+			message: 'Issue happen when get authen infor',
 		});
 	}
 
 	try {
-		//    console.log(`public key ${keyStore.publicKey} and private key ${keyStore.privateKey}`)
 		const decodeUser = JWT.verify(accessToken, keyStore.privateKey);
 		if (userId !== decodeUser.userId) {
 			throw new AuthFailureError({
-				message: 'Can not verify key',
+				message: 'Not Authenticate User',
 			});
 		}
 		req.keyStore = keyStore;
-		//    console.log(keyStore)
 		next();
 	} catch (error) {
 		throw new AuthFailureError({
-			message: 'Is there something wrong when verify key',
+			message: 'Invalid Token',
 		});
 	}
 });

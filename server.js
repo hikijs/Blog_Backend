@@ -27,5 +27,5 @@ start()
 	.catch((error) => {
 		releaseRedisConnection();
 		releaseDatabaseConnection();
-		console.log('App occured during startup', error);
+		console.log('App occured Issue During Startup', error);
 	});

@@ -20,7 +20,7 @@ class UserService {
 			const userData = await UserQuery.getUserById(userId);
 			return userData;
 		} catch (error) {
-			throw new Error(`Get Profile failed with reason ${error}`);
+			throw new Error('Issue Happen When Get User Profile');
 		}
 	};
 
