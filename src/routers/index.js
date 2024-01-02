@@ -8,6 +8,7 @@ const router = express.Router();
 // router.use(apiKey)
 // 2. check permission
 // router.use(permission('0000'))
+router.use('/v1/api-docs', require('./docs'));
 router.use('/v1/api/auth', require('./access'));
 router.use('/v1/api/oauth', require('./accessOauth'));
 router.use('/v1/api/upload', require('./upload'));
