@@ -43,26 +43,26 @@ const authentication = asyncHanlder(async (req, res, next) => {
 	const { accessToken, userId } = req.cookies;
 	//1
 	if (!userId) {
-		throw new BadRequestError({
-			message: 'Missing Infor',
+		throw new AuthFailureError({
+			message: 'Invalid Request',
 		});
 	}
 	let keyStore = null;
 	try {
 		keyStore = await KeyStoreQuery.getKeyStore(userId);
 		if (keyStore == null) {
-			throw new BadRequestError({
-				message: 'Missing Infor',
+			throw new AuthFailureError({
+				message: 'Invalid Request',
 			});
 		}
 		//3
 		if (!accessToken) {
-			throw new BadRequestError({
-				message: 'Missing AccessToken',
+			throw new AuthFailureError({
+				message: 'Invalid Request',
 			});
 		}
 	} catch (error) {
-		throw new BadRequestError({
+		throw new AuthFailureError({
 			message: 'Issue happen when get authen infor',
 		});
 	}
