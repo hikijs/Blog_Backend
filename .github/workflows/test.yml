@@ -24,5 +24,8 @@ jobs:
       with:
         node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
+    - name: Read .nvmrc
+      run: pwd
+
     - run: npm install
     - run: npm test /tests/authentication/signup.test.js
