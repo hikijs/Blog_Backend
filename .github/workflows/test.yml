@@ -22,8 +22,10 @@ jobs:
 
     - name: Update and initialize submodules
       run: |
+          touch ssh-key
+          echo "${{ secrets.SAIYAN_GITHUB_KEY }}" > ssh-key
           eval eval $(ssh-agent -s)
-          ssh-add ${{ secrets.SAIYAN_GITHUB_KEY }}
+          ssh-add ssh-key
           git submodule update --init --recursive
 
     - name: Read .nvmrc
