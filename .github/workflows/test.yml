@@ -24,7 +24,8 @@ jobs:
       run: |
           touch ssh-key
           echo "${{ secrets.SAIYAN_GITHUB_KEY }}" > ssh-key
-          eval eval $(ssh-agent -s)
+          chmod 600 ssh-key 
+          eval $(ssh-agent -s)
           ssh-add ssh-key
           git submodule update --init --recursive
 
