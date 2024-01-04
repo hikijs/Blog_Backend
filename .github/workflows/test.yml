@@ -18,7 +18,7 @@ jobs:
     - name: Create Environment
       run: |
           touch .env.test
-          echo "${{ secrets_test.ENV }}" > .env.test
+          echo "${{ secrets.ENV_TEST }}" > .env.test
 
     - name: Read .nvmrc
       run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
