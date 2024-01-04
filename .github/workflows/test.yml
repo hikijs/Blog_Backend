@@ -21,7 +21,10 @@ jobs:
           echo "${{ secrets.ENV_TEST }}" > .env.test
 
     - name: Update and initialize submodules
-      run: git submodule update --init --recursive
+      run: |
+          eval eval $(ssh-agent -s)
+          ssh-add ${{ secrets.SAIYAN_GITHUB_KEY }}
+          git submodule update --init --recursive
 
     - name: Read .nvmrc
       run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
