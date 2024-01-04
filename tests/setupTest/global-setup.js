@@ -20,7 +20,7 @@ async function followLogsMysql() {
 			stdout: true,
 			stderr: true
 		}, (err, stream) => {
-			let counter = 30;
+			let counter = 60;
 			const timeout = setInterval(() => {
 				counter--;
 				if (counter === 0) {
@@ -49,7 +49,62 @@ async function followLogsMysql() {
 
 			// Handle stream closure
 			stream.on('end', () => {
-				console.log('Log stream closed.');
+				console.log('Log stream mysql2 closed.');
+			});
+
+			// Handle stream error
+			stream.on('error', (error) => {
+				console.error('Error in log stream:', error.message);
+				clearInterval(timeout); // Clear the timeout if there is an error
+				reject(error);
+			});
+		});
+	});
+}
+
+async function followLogsRabbitMq() {
+	return new Promise((resolve, reject) => {
+		// Create a Docker instance
+		const docker = new Docker();
+		// Get the container by name
+		const container = docker.getContainer('rabbitmq_test');
+		
+		// Stream logs from the container in real-time
+		container.logs({
+			follow: true,
+			stdout: true,
+			stderr: true
+		}, (err, stream) => {
+			let counter = 60;
+			const timeout = setInterval(() => {
+				counter--;
+				if (counter === 0) {
+					clearInterval(timeout);
+					reject('Set up rabbitmq time out');
+				}
+			}, 1000);
+
+			if (err) {
+				console.error('Error streaming logs:', err.message);
+				clearInterval(timeout); // Clear the timeout if there is an error
+				reject(err);
+				return;
+			}
+
+			// Handle log data
+			stream.on('data', (data) => {
+				const log = data.toString('utf8');
+				console.log(log);
+				if (log.includes('Server startup complete')) {
+					clearInterval(timeout); // Clear the timeout if the condition is met
+					stream.destroy(); // stop following the logs
+					resolve();
+				}
+			});
+
+			// Handle stream closure
+			stream.on('end', () => {
+				console.log('Log stream rabbitmq closed.');
 			});
 
 			// Handle stream error
@@ -113,6 +168,7 @@ module.exports = async () => {
 	
 	try {
 		await followLogsMysql();
+		await followLogsRabbitMq();
 		await isDbCanConnect();
 		const dbScript = path.join(currentDir, '..', '..') + '/db_manage.sh';
 		execSync(`${dbScript} -s -t`);
