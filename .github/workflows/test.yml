@@ -15,6 +15,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Create Environment
+      run: |
+          touch .env.test
+          echo "${{ secrets_test.ENV }}" > .env.test
+
     - name: Read .nvmrc
       run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
       id: nvm
