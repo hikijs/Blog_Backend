@@ -83,7 +83,7 @@ class AccessController {
 
 	// eslint-disable-next-line no-unused-vars
 	logout = async (req, res, next) => {
-		new CREATED({
+		new OK({
 			message: 'Logout Success!',
 			metaData: await AccessService.logout(req, res),
 		}).send(res);
@@ -93,7 +93,7 @@ class AccessController {
 	forgotPassword = async (req, res, next) => {
 		const { metaData } = await AccessService.forgotPassword(req, res);
 		new OK({
-			message: 'Sent Mail Successful',
+			message: 'The Reset Url Was Send Successfully',
 			metaData: metaData,
 		}).send(res);
 	};

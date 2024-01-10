@@ -139,7 +139,7 @@ describe('APIs Create Post', () => {
 			expect(response.statusText).toBe('Unauthorized');
 			expect(response.data).toMatchObject({
 				code: 10003,
-				message: 'Invalid request',
+				message: 'Invalid Request',
 			});
 		});
 
