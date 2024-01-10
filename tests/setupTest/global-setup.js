@@ -6,13 +6,34 @@ require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
 
 const { initializeDatabase } = require('../../src/dbs/setupDatabase');
 const Docker = require('dockerode');
+const CONTAINER = {
+	MYSQL: 
+	{
+		name: 'mysql_test',
+		timeout: 60,
+		confirmString: '/usr/sbin/mysqld: ready for connections',
+	},
+	RABBITMQ: {
+		name: 'rabbitmq_test',
+		timeout: 60,
+		confirmString: 'Server startup complete',
+	}
+};
 
-async function followLogsMysql() {
+async function resetMysqlData()
+{
+	console.log('===>  CLEAN MYSQL DATA <===');
+	const mysqlDataFolder = path.join(__dirname, 'mysqlData');
+	execSync(`rm -rf ${mysqlDataFolder}`);
+	execSync(`mkdir ${mysqlDataFolder}`);
+}
+
+async function followLogsContainer(monitorContainer) {
 	return new Promise((resolve, reject) => {
 		// Create a Docker instance
 		const docker = new Docker();
 		// Get the container by name
-		const container = docker.getContainer('mysql_test');
+		const container = docker.getContainer(monitorContainer.name);
 		
 		// Stream logs from the container in real-time
 		container.logs({
@@ -20,7 +41,7 @@ async function followLogsMysql() {
 			stdout: true,
 			stderr: true
 		}, (err, stream) => {
-			let counter = 60;
+			let counter = monitorContainer.timeout;
 			const timeout = setInterval(() => {
 				counter--;
 				if (counter === 0) {
@@ -39,8 +60,7 @@ async function followLogsMysql() {
 			// Handle log data
 			stream.on('data', (data) => {
 				const log = data.toString('utf8');
-				console.log(log);
-				if (log.includes('ready for connections')) {
+				if (log.includes(monitorContainer.confirmString)){
 					clearInterval(timeout); // Clear the timeout if the condition is met
 					stream.destroy(); // stop following the logs
 					resolve();
@@ -62,70 +82,17 @@ async function followLogsMysql() {
 	});
 }
 
-async function followLogsRabbitMq() {
-	return new Promise((resolve, reject) => {
-		// Create a Docker instance
-		const docker = new Docker();
-		// Get the container by name
-		const container = docker.getContainer('rabbitmq_test');
-		
-		// Stream logs from the container in real-time
-		container.logs({
-			follow: true,
-			stdout: true,
-			stderr: true
-		}, (err, stream) => {
-			let counter = 60;
-			const timeout = setInterval(() => {
-				counter--;
-				if (counter === 0) {
-					clearInterval(timeout);
-					reject('Set up rabbitmq time out');
-				}
-			}, 1000);
-
-			if (err) {
-				console.error('Error streaming logs:', err.message);
-				clearInterval(timeout); // Clear the timeout if there is an error
-				reject(err);
-				return;
-			}
-
-			// Handle log data
-			stream.on('data', (data) => {
-				const log = data.toString('utf8');
-				console.log(log);
-				if (log.includes('Server startup complete')) {
-					clearInterval(timeout); // Clear the timeout if the condition is met
-					stream.destroy(); // stop following the logs
-					resolve();
-				}
-			});
-
-			// Handle stream closure
-			stream.on('end', () => {
-				console.log('Log stream rabbitmq closed.');
-			});
-
-			// Handle stream error
-			stream.on('error', (error) => {
-				console.error('Error in log stream:', error.message);
-				clearInterval(timeout); // Clear the timeout if there is an error
-				reject(error);
-			});
-		});
-	});
-}
 
 async function isDbCanConnect() {
 	return new Promise((resolve, reject) => {
-		let cnt = 10;
+		let cnt = 20;
 		const checkConnectInterval = setInterval(async () => {
 			if (cnt == 0) {
 				clearInterval(checkConnectInterval);
 				reject();
 			}
 			try {
+				console.log(`Try to connect to DB ${cnt}`);
 				await initializeDatabase();
 				clearInterval(checkConnectInterval);
 				resolve();
@@ -156,6 +123,7 @@ module.exports = async () => {
 				log: true,
 			});
 		}
+		await resetMysqlData();
 		// ️️️✅ Best Practice: Start the infrastructure within a test hook - No failures occur because the DB is down
 		await dockerCompose.upAll({
 			cwd: path.join(currentDir),
@@ -167,8 +135,9 @@ module.exports = async () => {
 	}
 	
 	try {
-		await followLogsMysql();
-		await followLogsRabbitMq();
+		const mysqlDone = followLogsContainer(CONTAINER.MYSQL);
+		const rabbitMqDone = followLogsContainer(CONTAINER.RABBITMQ);
+		await Promise.all([mysqlDone, rabbitMqDone]);
 		await isDbCanConnect();
 		const dbScript = path.join(currentDir, '..', '..') + '/db_manage.sh';
 		execSync(`${dbScript} -s -t`);
