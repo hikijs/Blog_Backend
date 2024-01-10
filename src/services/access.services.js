@@ -552,7 +552,7 @@ class AccessService {
 		const email = req.body.email;
 		if (!email) {
 			throw new BadRequestError({
-				message: 'Please Fill Email',
+				message: 'Missing Email Address',
 			});
 		}
 		//2. check mail exist or not in the db
@@ -566,7 +566,6 @@ class AccessService {
 		// Generate a unique token
 		const code = generateVerificationCode();
 		const codeExpiry = Date.now() + TIMEOUT.verifyCode; // Token expires in 1 hour
-		console.log(`code is ${code}`);
 		await VerifyCodeQuery.createNewVerifyCode(
 			code,
 			codeExpiry,
@@ -574,11 +573,8 @@ class AccessService {
 			userExist.userId
 		);
 		mailTransport.send(email, 'reset code', code);
-		const metaData = {
-			msg: 'Please check your email',
-		};
 		createCookiesForgotPassword(res, userExist.userId);
-		return { metaData };
+		return {};
 	};
 
 	static forgotPasswordVerify = async (req, res) => {

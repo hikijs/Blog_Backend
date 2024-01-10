@@ -14,9 +14,9 @@ const initializeDatabase = async () => {
 		}
 	} catch (error) {
 		console.log('Connection to Mysql Establish Failure');
+		console.timeEnd('>>> DB setup');
 		throw new Error(error);
 	}
-
 	console.timeEnd('>>> DB setup');
 };
 

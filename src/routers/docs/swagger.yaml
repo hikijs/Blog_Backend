@@ -1,2331 +1,2330 @@
 openapi: 3.0.3
 info:
-  title: Social Blog - OpenAPI 3.0
-  description: >-
-    This project is same as Medium.com. It is the social and blogging
-    platform
-  contact:
-    email: hungdevngu99@gmail.com
-  version: 1.0.0
+    title: Social Blog - OpenAPI 3.0
+    description: >-
+        This project is same as Medium.com. It is the social and blogging
+        platform
+    contact:
+        email: hungdevngu99@gmail.com
+    version: 1.0.0
 servers:
-  - url: http://localhost:3000/v1/api
+    - url: http://localhost:3000/v1/api
 tags:
-  - name: Authentication
-    description: Group Apis Authenticate Users
-  - name: User
-    description: Group Apis CRUD User
-  - name: Post
-    description: Group Apis CRUD Post
-  - name: Uploading
-    description: Group Apis Upload Media
+    - name: Authentication
+      description: Group Apis Authenticate Users
+    - name: User
+      description: Group Apis CRUD User
+    - name: Post
+      description: Group Apis CRUD Post
+    - name: Uploading
+      description: Group Apis Upload Media
 paths:
-  /auth/signup:
-    post:
-      tags:
-        - Authentication
-      summary: Register A User To The Application
-      description: User need create account for using the application in the first stage
-      operationId: signupUsingPOST
-      requestBody:
-        description: User must provide bellow infor for creating a new account
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignUpData'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthSuccessResponse'
-        '400':
-          description: Missing Information Or User Existed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequestResponse'
-  /auth/login:
-    post:
-      tags:
-        - Authentication
-      summary: Authenticates a User to the application
-      description: User can authenticate after registration,
-      operationId: loginUsingPOST
-      requestBody:
-        description: User must provide bellow infor for log in to application
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginData'
-      responses:
-        '200':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthSuccessResponse'
-        '400':
-          description: Missing Information
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequestResponse'
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailureResponse'
-  /auth/logout:
-    delete:
-      tags:
-        - Authentication
-      summary: Logout User And Clear Access Infor
-      description: Remove access infor when user log out of application
-      operationId: logoutUsingDELETE
-      responses:
-        '200':
-          description: Logout Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LogoutSuccessResponse'
-        '400':
-          description: Missing Access Information (accessToken, refreshToken, userId)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadLogoutResponse'
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailLogoutResponse'
-                
-  /auth/password:
-    put:
-      tags:
-        - Authentication
-      summary: Suppport reset password for both unauthenticated and authenticated user
-      description: |-
-        * For Unathenticated User, need call this api with query email= {user's email}
-        then the reset password url within token will be sent direct to user's email. When follow this url
-        the user can reset password
-        * For Authenticated User, we does not need the query email, user can resset password directly
-      parameters:
-        - in: query
-          name: email
-          schema:
+    /auth/signup:
+        post:
+            tags:
+                - Authentication
+            summary: Register A User To The Application
+            description: User need create account for using the application in the first stage
+            operationId: signupUsingPOST
+            requestBody:
+                description: User must provide bellow infor for creating a new account
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SignUpData'
+            responses:
+                '201':
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthSuccessResponse'
+                '400':
+                    description: Missing Information Or User Existed
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestResponse'
+    /auth/login:
+        post:
+            tags:
+                - Authentication
+            summary: Authenticates a User to the application
+            description: User can authenticate after registration,
+            operationId: loginUsingPOST
+            requestBody:
+                description: User must provide bellow infor for log in to application
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LoginData'
+            responses:
+                '200':
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthSuccessResponse'
+                '400':
+                    description: Missing Information
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestResponse'
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailureResponse'
+    /auth/logout:
+        delete:
+            tags:
+                - Authentication
+            summary: Logout User And Clear Access Infor
+            description: Remove access infor when user log out of application
+            operationId: logoutUsingDELETE
+            responses:
+                '200':
+                    description: Logout Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LogoutSuccessResponse'
+                '400':
+                    description: Missing Access Information (accessToken, refreshToken, userId)
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BadLogoutResponse'
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailLogoutResponse'
+
+    /auth/password:
+        put:
+            tags:
+                - Authentication
+            summary: Suppport reset password for both unauthenticated and authenticated user
+            description: |-
+                * For Unathenticated User, need call this api with query email= {user's email}
+                then the reset password url within token will be sent direct to user's email. When follow this url
+                the user can reset password
+                * For Authenticated User, we does not need the query email, user can resset password directly
+            parameters:
+                - in: query
+                  name: email
+                  schema:
+                      type: string
+                      format: email
+                  description: User forgot password need provide registered email in the query
+            requestBody:
+                description: |-
+                    * for case unauthenticated user, user must provide key and new password
+                    * for case authenticated user, user need provide old and new password
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            anyOf:
+                                - $ref: '#/components/schemas/unauthenticatedUserResetPass'
+                                - $ref: '#/components/schemas/authenticatedUserResetPass'
+            operationId: forgotPasswordUsingPOST
+            responses:
+                '202':
+                    description: Accepted Reset Password
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessForgotPasswordResponse'
+                '204':
+                    description: Reset Password Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResetPasswordResponse'
+                '400':
+                    description: The provided email does not registered yet or Password Reset Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BadForgotPasswordResponse'
+
+    /user/{userId}:
+        get:
+            tags:
+                - User
+            summary: Get Other User Infor
+            description: Get Other User Infor base on the relationship between them
+            parameters:
+                - in: path
+                  name: userId
+                  schema:
+                      type: string
+                  required: true
+                  description: the id of user who want to get info
+            operationId: userGET
+            responses:
+                '200':
+                    description: Getting User infor Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessGetUserInforResponse'
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+                '500':
+                    description: Issue Happen When Getting Profile User In Server
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerResponse'
+        delete:
+            tags:
+                - User
+            summary: Delete account of user and log user out of system
+            description: Delete account of user (only owner can delete self account)
+            parameters:
+                - in: path
+                  name: userId
+                  schema:
+                      type: string
+                  required: true
+                  description: the id of user who want to delete profile
+            operationId: userDELETE
+            responses:
+                '204':
+                    description: No Content
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+                '500':
+                    description: Issue Happen When Delete Profile User In Server
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/unknowCode'
+                                    message:
+                                        type: string
+                                        example: Issue Happen When Delete Your Account
+
+        put:
+            tags:
+                - User
+            summary: Update User Profile
+            description: The Owner Can Update Their Profile
+            parameters:
+                - in: path
+                  name: userId
+                  schema:
+                      type: string
+                  required: true
+                  description: the id of user who want to update info
+            operationId: userPUT
+            responses:
+                '200':
+                    description: Update My Profile Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessUpdateUserInforResponse'
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+                '500':
+                    description: Issue Happen When Update Profile User In Server
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/unknowCode'
+                                    message:
+                                        type: string
+                                        example: Issue Happen When Update Your Account
+    /user/request-verify-email:
+        post:
+            tags:
+                - User
+            summary: request verify the email
+            description: The server will send the token to the user's email that was registered
+            operationId: requestVerifyPOST
+            responses:
+                '200':
+                    description: Request Verified Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessRequestVerifyResponse'
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+                '500':
+                    description: Issue Happen When Getting Profile User In Server
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/unknowCode'
+                                    message:
+                                        type: string
+                                        example: Issue Happen When Request Verify Account
+
+    /user/verify-email:
+        post:
+            tags:
+                - User
+            summary: request verify the email
+            description: The server will send the token to the user's email that was registered
+            operationId: verifyEmailPOST
+            requestBody:
+                description: Provided the token was sent to user's email when request verify
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                verifyToken:
+                                    type: string
+                                    example: ABCDEF
+            responses:
+                '200':
+                    description: Request Verified Successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessRequestVerifyResponse'
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+                '500':
+                    description: Issue Happen When Getting Profile User In Server
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/unknowCode'
+                                    message:
+                                        type: string
+                                        example: Issue Happen When Request Verify
+
+    /user/friend-request/{userId}:
+        post:
+            tags:
+                - User
+            summary: Send Friend Request
+            parameters:
+                - in: path
+                  name: userId
+                  schema:
+                      type: string
+                  required: true
+                  description: the id of user that current user want to be a friend
+            operationId: friendRequestPOST
+            responses:
+                '200':
+                    description: Friend Request Was Sent
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessFriendRequestResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+    /user/friend-requests:
+        get:
+            tags:
+                - User
+            summary: Get List Friend Request
+            description: Get List Friend Request By Filter Status (Pending, Accepted, Rejected)
+            parameters:
+                - in: query
+                  name: ans
+                  schema:
+                      type: string
+                      enum: [Pending, Accepted, Rejected]
+                  required: true
+            operationId: friendRequestsGET
+            responses:
+                '200':
+                    description: Friend Request Was Sent
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/successCode'
+                                    message:
+                                        type: string
+                                        example: Your reply was sent
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /user/answere-request/{requestId}:
+        post:
+            tags:
+                - User
+            summary: Send Friend Request
+            parameters:
+                - in: path
+                  name: requestId
+                  schema:
+                      type: string
+                  required: true
+                  description: the id of user that current user want to be a friend
+                - in: query
+                  name: ans
+                  schema:
+                      type: string
+                      enum: [Accepted, Rejected]
+                  required: true
+                  description: User can accepted or reject friend request
+            operationId: answereFriendRequestPOST
+            responses:
+                '200':
+                    description: Friend Request Was Sent
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/successCode'
+                                    message:
+                                        type: string
+                                        example: Your reply was sent
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /user/friends:
+        get:
+            tags:
+                - User
+            summary: Get List User's Friends
+            description: Get List Friends Of User
+            operationId: friendsGET
+            responses:
+                '200':
+                    description: Friend Request Was Sent
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessGetFriendsResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /user/unfriend/{friendId}:
+        delete:
+            tags:
+                - User
+            summary: Get List User's Friends
+            description: Get List Friends Of User
+            parameters:
+                - in: path
+                  name: friendId
+                  schema:
+                      type: string
+                  required: true
+                  description: the id of friend that want to un friend
+            operationId: unfriendDELETE
+            responses:
+                '200':
+                    description: UnFriend Successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessUnfriendResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+    /user/notifies:
+        get:
+            tags:
+                - User
+            summary: Get List User's Notify
+            description: Get List User's Notify
+            operationId: notifiesGET
+            responses:
+                '200':
+                    description: Get List Notifies Successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessGetNotifiesResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /upload/image:
+        post:
+            tags:
+                - Uploading
+            summary: Upload Image To Server
+            description: In blog application image upload for thumbnail, content and user's avatar
+            parameters:
+                - in: query
+                  name: postId
+                  schema:
+                      type: string
+                  required: false
+                  description: if the image is for using content or thumbnail of the post
+                - in: query
+                  name: topic
+                  schema:
+                      type: string
+                      enum: [content, thumbnail, avatar]
+                  required: true
+                  description: content and thumbnail is used for post, and avatar is used for user avatar
+            operationId: uploadImagePOST
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                image:
+                                    type: string
+                                    format: binary
+                                    description: image file with extension is .png or .jpg
+            responses:
+                '201':
+                    description: Uploaded a Image Success!
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessUploadImageResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /post/publish:
+        post:
+            tags:
+                - Post
+            summary: Publist Post
+            description: Publish Post With Thumbnail
+            operationId: publishPOST
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                thumbnail:
+                                    type: string
+                                    format: binary
+                                    description: thumbnail for blog file extension should be .png .jpg
+                                postData:
+                                    $ref: '#/components/schemas/publishPostData'
+
+            responses:
+                '201':
+                    description: Publish new Post With Thumbnail Success!
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessPublishNewPostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+    /post/{postId}:
+        get:
+            tags:
+                - Post
+            summary: Read Post
+            description: Read own post or others user's post
+            operationId: readGET
+            parameters:
+                - in: path
+                  name: postId
+                  schema:
+                      type: string
+                  required: true
+                  description: The id of the post
+            responses:
+                '200':
+                    description: Read Post Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessReadPostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+        put:
+            tags:
+                - Post
+            summary: Edit Post
+            description: Edit Post Data
+            operationId: editPUT
+            parameters:
+                - in: path
+                  name: postId
+                  schema:
+                      type: string
+                  required: true
+                  description: The id of the post
+            requestBody:
+                description: User must provide bellow infor for creating a new account
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                title:
+                                    type: string
+                                statusEdit:
+                                    type: string
+                                    enum: [publish, unpublish, draft]
+                                sharePermission:
+                                    type: string
+                                    enum: [public, private, follower]
+                                summarize:
+                                    type: string
+                                content:
+                                    type: string
+                                categrogies:
+                                    type: array
+                                    items:
+                                        type: string
+                                    example: [technologies, others]
+            responses:
+                '200':
+                    description: Edit Post Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessEditPostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+        delete:
+            tags:
+                - Post
+            summary: Delete Post
+            description: Delete own post only
+            operationId: postDELETE
+            parameters:
+                - in: path
+                  name: postId
+                  schema:
+                      type: string
+                  required: true
+                  description: The id of the post
+            responses:
+                '200':
+                    description: Delete Post Successfull
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeletePostSuccessResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /post/my:
+        get:
+            tags:
+                - Post
+            summary: Get All My Post
+            description: Get All My Post Like Wall In Facebook
+            parameters:
+                - in: query
+                  name: offset
+                  schema:
+                      type: integer
+                  required: false
+                  description: the offset to start return data
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                  required: false
+                  description: the limit post return each time call api
+            operationId: myPostGET
+            responses:
+                '200':
+                    description: Get All Posts Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessGetAllMyPostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+        delete:
+            tags:
+                - Post
+            summary: Delete All My Post
+            description: Delete All My Post
+            operationId: myPostDELETE
+            responses:
+                '200':
+                    description: Delete all post success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessDeleteAllMyPostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+    /post/feed:
+        get:
+            tags:
+                - Post
+            summary: Get Feed For User
+            description: Get Post of user's friend, hisself post or public post
+            parameters:
+                - in: query
+                  name: offset
+                  schema:
+                      type: integer
+                  required: false
+                  description: the offset to start return data
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                  required: false
+                  description: the limit post return each time call api
+
+            operationId: feedGET
+            responses:
+                '200':
+                    description: Get Feed Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessGetFeedResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+    /post/comment/{postId}:
+        post:
+            tags:
+                - Post
+            summary: Create New Comment
+            description: Create New Comment
+            operationId: commentPOST
+            parameters:
+                - in: path
+                  name: postId
+                  schema:
+                      type: string
+                  required: true
+                  description: The postid that want to read comment
+            requestBody:
+                description: Provide the comment content and parent comment Id if needed
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                comment:
+                                    type: string
+                                    description: the content of the comment
+                                    example: This is really nice
+                                parentCommentId:
+                                    type: string
+                                    nullable: true
+                                    description: If user reply for a comment should have the parent id
+            responses:
+                '201':
+                    description: Create A New Comment
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessCreateACommentResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /post/comment/{commentId}:
+        delete:
+            tags:
+                - Post
+            summary: Delete Comment By Comment Id
+            description: Delete Comment By Comment Id
+            operationId: commentDELETE
+            parameters:
+                - in: path
+                  name: commentId
+                  schema:
+                      type: string
+                  required: true
+                  description: the commentid need to delete
+            responses:
+                '200':
+                    description: Delete Comment Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessDeleteCommentResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+        put:
+            tags:
+                - Post
+            summary: Edit Comment By Comment Id
+            description: Edit Comment By Comment Id
+            operationId: commentPUT
+            parameters:
+                - in: path
+                  name: commentId
+                  schema:
+                      type: string
+                  required: true
+                  description: the commentid need to edit
+            responses:
+                '200':
+                    description: Delete Comment Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessEditCommentResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /post/comments/{postId}:
+        get:
+            tags:
+                - Post
+            summary: Get All Comments Of Post Id
+            description: Get All Comments Of Post Id
+            operationId: commentsGET
+            parameters:
+                - in: path
+                  name: postId
+                  schema:
+                      type: string
+                  required: true
+                  description: The postid that want to read comment
+                - in: query
+                  name: offsetParent
+                  schema:
+                      type: integer
+                  required: false
+                  description: the offset start to return parent comment
+                - in: query
+                  name: limitParent
+                  schema:
+                      type: integer
+                  required: false
+                  description: limit parent comment return each call
+                - in: query
+                  name: limitChild
+                  schema:
+                      type: integer
+                  required: false
+                  description: limit child comment return each parent comment
+            responses:
+                '200':
+                    description: Get Comments Successful
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessGetCommentForPostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+    /post/like:
+        post:
+            tags:
+                - Post
+            summary: Like Post
+            description: Like Post
+            operationId: likePOST
+            parameters:
+                - in: query
+                  name: postId
+                  schema:
+                      type: string
+                  required: false
+                  description: the postId user want to like
+                - in: query
+                  name: commentId
+                  schema:
+                      type: string
+                  required: false
+                  description: the commentId user want to like
+            responses:
+                '201':
+                    description: Like Post Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessLikePostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+    /post/unlike:
+        delete:
+            tags:
+                - Post
+            summary: Unlike Post
+            description: Unlike Post
+            operationId: unlikeDELETE
+            parameters:
+                - in: query
+                  name: postId
+                  schema:
+                      type: string
+                  required: false
+                  description: the postId user want to unlike
+                - in: query
+                  name: commentId
+                  schema:
+                      type: string
+                  required: false
+                  description: the commentId user want to unlike
+            responses:
+                '200':
+                    description: UnLike Post Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessUnLikePostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /post/save:
+        post:
+            tags:
+                - Post
+            summary: Save Post
+            description: Save Post
+            operationId: savePOST
+            requestBody:
+                description: Provided PostId and nameList for saving
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                postId:
+                                    $ref: '#/components/schemas/postId'
+                                nameSaveList:
+                                    type: string
+                                    description: if nameSaveList does not exist, create a new save list
+                                    example: nodejs
+            responses:
+                '200':
+                    description: Save Post Successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessSavePostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+    /post/unsave:
+        delete:
+            tags:
+                - Post
+            summary: Get Save Posts From SaveList
+            description: Get Save Posts From SaveList
+            operationId: savePostGET
+            parameters:
+                - in: query
+                  name: postId
+                  schema:
+                      type: string
+                  required: true
+                  description: the postId that want to unsave out of saveList
+                - in: query
+                  name: saveListId
+                  schema:
+                      type: string
+                  required: true
+                  description: the saveListId that want unsave post out
+            responses:
+                '200':
+                    description: Get Saved Posts From Save List Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessUnsavePostResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /post/save-posts/{saveListId}:
+        get:
+            tags:
+                - Post
+            summary: Get Save Posts From SaveList
+            description: Get Save Posts From SaveList
+            operationId: savePostsGET
+            parameters:
+                - in: path
+                  name: saveListId
+                  schema:
+                      type: string
+                  required: true
+            responses:
+                '200':
+                    description: Get Saved Posts From Save List Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessGetSavedPostSuccess'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+    /post/save-list:
+        get:
+            tags:
+                - Post
+            summary: Get Save List Of User
+            description: Get Save List Of User
+            operationId: savelistGET
+            responses:
+                '200':
+                    description: Get Save List Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessGetSaveListResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+        delete:
+            tags:
+                - Post
+            summary: Delete Save List
+            description: Delete Save List
+            operationId: savelistDELETE
+            responses:
+                '200':
+                    description: Delete Savelist Successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessDeleteSaveListResponse'
+                '400':
+                    description: Invalid or missing infor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    code:
+                                        $ref: '#/components/schemas/badRequestCode'
+                                    message:
+                                        type: string
+                                        example: Please give more information
+                '401':
+                    description: Authenticate Failure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthFailResponse'
+
+components:
+    schemas:
+        username:
+            type: string
+            description: the name that user want to use in the application
+            example: testUser01
+        email:
             type: string
             format: email
-          description: User forgot password need provide registered email in the query
-      requestBody:
-        description: |-
-          * for case unauthenticated user, user must provide key and new password
-          * for case authenticated user, user need provide old and new password
-        required: false
-        content:
-          application/json:
-            schema:
-              anyOf:
-                - $ref: '#/components/schemas/unauthenticatedUserResetPass'
-                - $ref: '#/components/schemas/authenticatedUserResetPass'
-      operationId: forgotPasswordUsingPOST
-      responses:
-        '202':
-          description: Accepted Reset Password
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessForgotPasswordResponse'
-        '204':
-          description: Reset Password Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResetPasswordResponse'
-        '400':
-          description: The provided email does not registered yet or Password Reset Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadForgotPasswordResponse'
-
-
-  /user/{userId}:
-    get:
-      tags:
-      - User
-      summary: Get Other User Infor
-      description: Get Other User Infor base on the relationship between them
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: string
-          required: true
-          description: the id of user who want to get info
-      operationId: userGET
-      responses:
-        '200':
-          description: Getting User infor Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessGetUserInforResponse'
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-        '500':
-          description: Issue Happen When Getting Profile User In Server
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerResponse'
-    delete:
-      tags:
-      - User
-      summary: Delete account of user and log user out of system
-      description: Delete account of user (only owner can delete self account)
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: string
-          required: true
-          description: the id of user who want to delete profile
-      operationId: userDELETE
-      responses:
-        '204':
-          description: No Content
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-        '500':
-          description: Issue Happen When Delete Profile User In Server
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/unknowCode"
-                  message:
-                    type: string
-                    example: Issue Happen When Delete Your Account
-      
-    put:
-      tags:
-      - User
-      summary: Update User Profile
-      description: The Owner Can Update Their Profile
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: string
-          required: true
-          description: the id of user who want to update info
-      operationId: userPUT
-      responses:
-        '200':
-          description: Update My Profile Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessUpdateUserInforResponse'
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-        '500':
-          description: Issue Happen When Update Profile User In Server
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/unknowCode"
-                  message:
-                    type: string
-                    example: Issue Happen When Update Your Account
-  /user/request-verify-email:
-    post:
-      tags:
-      - User
-      summary: request verify the email
-      description: The server will send the token to the user's email that was registered
-      operationId: requestVerifyPOST
-      responses:
-        '200':
-          description: Request Verified Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessRequestVerifyResponse'
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-        '500':
-          description: Issue Happen When Getting Profile User In Server
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/unknowCode"
-                  message:
-                    type: string
-                    example: Issue Happen When Request Verify Account
-    
-  /user/verify-email:
-    post:
-      tags:
-      - User
-      summary: request verify the email
-      description: The server will send the token to the user's email that was registered
-      operationId: verifyEmailPOST
-      requestBody:
-        description: Provided the token was sent to user's email when request verify
-        required: false
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                verifyToken: 
-                  type: string
-                  example: ABCDEF
-      responses:
-        '200':
-          description: Request Verified Successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessRequestVerifyResponse'
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-        '500':
-          description: Issue Happen When Getting Profile User In Server
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/unknowCode"
-                  message:
-                    type: string
-                    example: Issue Happen When Request Verify 
-    
-  /user/friend-request/{userId}:
-    post:
-      tags:
-      - User
-      summary: Send Friend Request
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: string
-          required: true
-          description: the id of user that current user want to be a friend
-      operationId: friendRequestPOST
-      responses:
-        '200':
-          description: Friend Request Was Sent
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessFriendRequestResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  /user/friend-requests:
-    get:
-      tags:
-      - User
-      summary: Get List Friend Request
-      description: Get List Friend Request By Filter Status (Pending, Accepted, Rejected)
-      parameters:
-        - in: query
-          name: ans
-          schema:
-            type: string
-            enum: [Pending, Accepted, Rejected]
-          required: true
-      operationId: friendRequestsGET
-      responses:
-        '200':
-          description: Friend Request Was Sent
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                      $ref: "#/components/schemas/successCode"
-                  message:
-                    type: string
-                    example: Your reply was sent
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    
-  /user/answere-request/{requestId}:
-    post:
-      tags:
-      - User
-      summary: Send Friend Request
-      parameters:
-        - in: path
-          name: requestId
-          schema:
-            type: string
-          required: true
-          description: the id of user that current user want to be a friend
-        - in: query
-          name: ans
-          schema:
-            type: string
-            enum: [Accepted, Rejected]
-          required: true
-          description: User can accepted or reject friend request
-      operationId: answereFriendRequestPOST
-      responses:
-        '200':
-          description: Friend Request Was Sent
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                      $ref: "#/components/schemas/successCode"
-                  message:
-                    type: string
-                    example: Your reply was sent
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-
-  /user/friends:
-    get:
-      tags:
-      - User
-      summary: Get List User's Friends
-      description: Get List Friends Of User
-      operationId: friendsGET
-      responses:
-        '200':
-          description: Friend Request Was Sent
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessGetFriendsResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-
-  /user/unfriend/{friendId}:
-    delete:
-      tags:
-      - User
-      summary: Get List User's Friends
-      description: Get List Friends Of User
-      parameters:
-        - in: path
-          name: friendId
-          schema:
-            type: string
-          required: true
-          description: the id of friend that want to un friend
-      operationId: unfriendDELETE
-      responses:
-        '200':
-          description: UnFriend Successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessUnfriendResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  /user/notifies:
-    get:
-      tags:
-      - User
-      summary: Get List User's Notify
-      description: Get List User's Notify
-      operationId: notifiesGET
-      responses:
-        '200':
-          description: Get List Notifies Successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessGetNotifiesResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    
-  /upload/image:
-    post:
-      tags:
-      - Uploading
-      summary: Upload Image To Server
-      description: In blog application image upload for thumbnail, content and user's avatar
-      parameters:
-        - in: query
-          name: postId
-          schema:
-            type: string
-          required: false
-          description: if the image is for using content or thumbnail of the post
-        - in: query
-          name: topic
-          schema:
-            type: string
-            enum: [content, thumbnail, avatar]
-          required: true
-          description: content and thumbnail is used for post, and avatar is used for user avatar
-      operationId: uploadImagePOST
-      requestBody:
-        content:
-            multipart/form-data:
-              schema:
-                type: object
-                properties:
-                  image:
-                    type: string
-                    format: binary
-                    description: image file with extension is .png or .jpg
-      responses:
-        '201':
-          description: Uploaded a Image Success!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessUploadImageResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  
-  /post/publish:
-    post:
-      tags:
-      - Post
-      summary: Publist Post
-      description: Publish Post With Thumbnail
-      operationId: publishPOST
-      requestBody:
-        content:
-            multipart/form-data:
-              schema:
-                type: object
-                properties:
-                  thumbnail:
-                    type: string
-                    format: binary
-                    description: thumbnail for blog file extension should be .png .jpg
-                  postData:
-                    $ref: "#/components/schemas/publishPostData"
-                  
-      responses:
-        '201':
-          description: Publish new Post With Thumbnail Success!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessPublishNewPostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  /post/{postId}:
-    get:
-      tags:
-      - Post
-      summary: Read Post
-      description: Read own post or others user's post
-      operationId: readGET
-      parameters:
-        - in: path
-          name: postId
-          schema:
-            type: string
-          required: true
-          description: The id of the post
-      responses:
-        '200':
-          description: Read Post Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessReadPostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    put:
-      tags:
-      - Post
-      summary: Edit Post
-      description: Edit Post Data
-      operationId: editPUT
-      parameters:
-        - in: path
-          name: postId
-          schema:
-            type: string
-          required: true
-          description: The id of the post
-      requestBody:
-        description: User must provide bellow infor for creating a new account
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                statusEdit:
-                  type: string
-                  enum: [publish, unpublish, draft]
-                sharePermission:
-                  type: string
-                  enum: [public, private, follower]
-                summarize:
-                  type: string
-                content:
-                  type: string
-                categrogies:
-                  type: array
-                  items:
-                    type: string
-                  example: [technologies, others]
-      responses:
-        '200':
-          description: Edit Post Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEditPostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    
-    delete:
-      tags:
-      - Post
-      summary: Delete Post
-      description: Delete own post only
-      operationId: postDELETE
-      parameters:
-        - in: path
-          name: postId
-          schema:
-            type: string
-          required: true
-          description: The id of the post
-      responses:
-        '200':
-          description: Delete Post Successfull
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeletePostSuccessResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-          
-  /post/my:
-    get:
-      tags:
-      - Post
-      summary: Get All My Post
-      description: Get All My Post Like Wall In Facebook
-      parameters:
-        - in: query
-          name: offset
-          schema:
-            type: integer
-          required: false
-          description: the offset to start return data
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          required: false
-          description: the limit post return each time call api
-      operationId: myPostGET
-      responses:
-        '200':
-          description: Get All Posts Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessGetAllMyPostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    delete:
-      tags:
-      - Post
-      summary: Delete All My Post
-      description: Delete All My Post
-      operationId: myPostDELETE
-      responses:
-        '200':
-          description: Delete all post success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessDeleteAllMyPostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  /post/feed:
-    get:
-      tags:
-      - Post
-      summary: Get Feed For User
-      description: Get Post of user's friend, hisself post or public post
-      parameters:
-        - in: query
-          name: offset
-          schema:
-            type: integer
-          required: false
-          description: the offset to start return data
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          required: false
-          description: the limit post return each time call api
-          
-      operationId: feedGET
-      responses:
-        '200':
-          description: Get Feed Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessGetFeedResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  /post/comment/{postId}:
-    post:
-      tags:
-      - Post
-      summary: Create New Comment
-      description: Create New Comment
-      operationId: commentPOST
-      parameters:
-        - in: path
-          name: postId
-          schema:
-            type: string
-          required: true
-          description: The postid that want to read comment
-      requestBody:
-        description: Provide the comment content and parent comment Id if needed
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                comment:
-                  type: string
-                  description: the content of the comment
-                  example: This is really nice
-                parentCommentId:
-                  type: string
-                  nullable: true
-                  description: If user reply for a comment should have the parent id
-      responses:
-        '201':
-          description: Create A New Comment
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessCreateACommentResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-                
-  /post/comment/{commentId}:
-    delete:
-      tags:
-      - Post
-      summary: Delete Comment By Comment Id
-      description: Delete Comment By Comment Id
-      operationId: commentDELETE
-      parameters:
-        - in: path
-          name: commentId
-          schema:
-            type: string
-          required: true
-          description: the commentid need to delete
-      responses:
-        '200':
-          description: Delete Comment Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessDeleteCommentResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    put:
-      tags:
-      - Post
-      summary: Edit Comment By Comment Id
-      description: Edit Comment By Comment Id
-      operationId: commentPUT
-      parameters:
-        - in: path
-          name: commentId
-          schema:
-            type: string
-          required: true
-          description: the commentid need to edit
-      responses:
-        '200':
-          description: Delete Comment Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEditCommentResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    
-  /post/comments/{postId}:
-    get:
-      tags:
-      - Post
-      summary: Get All Comments Of Post Id
-      description: Get All Comments Of Post Id
-      operationId: commentsGET
-      parameters:
-        - in: path
-          name: postId
-          schema:
-            type: string
-          required: true
-          description: The postid that want to read comment
-        - in: query
-          name: offsetParent
-          schema:
-            type: integer
-          required: false
-          description: the offset start to return parent comment
-        - in: query
-          name: limitParent
-          schema:
-            type: integer
-          required: false
-          description: limit parent comment return each call
-        - in: query
-          name: limitChild
-          schema:
-            type: integer
-          required: false
-          description: limit child comment return each parent comment
-      responses:
-        '200':
-          description: Get Comments Successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessGetCommentForPostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  /post/like:
-    post:
-      tags:
-      - Post
-      summary: Like Post
-      description: Like Post
-      operationId: likePOST
-      parameters:
-        - in: query
-          name: postId
-          schema:
-            type: string
-          required: false
-          description: the postId user want to like
-        - in: query
-          name: commentId
-          schema:
-            type: string
-          required: false
-          description: the commentId user want to like
-      responses:
-        '201':
-          description: Like Post Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessLikePostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  /post/unlike:
-    delete:
-      tags:
-      - Post
-      summary: Unlike Post
-      description: Unlike Post
-      operationId: unlikeDELETE
-      parameters:
-        - in: query
-          name: postId
-          schema:
-            type: string
-          required: false
-          description: the postId user want to unlike
-        - in: query
-          name: commentId
-          schema:
-            type: string
-          required: false
-          description: the commentId user want to unlike
-      responses:
-        '200':
-          description: UnLike Post Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessUnLikePostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-                
-  /post/save:
-    post:
-      tags:
-      - Post
-      summary: Save Post
-      description: Save Post
-      operationId: savePOST
-      requestBody:
-        description: Provided PostId and nameList for saving
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                postId:
-                  $ref: "#/components/schemas/postId"
-                nameSaveList:
-                  type: string
-                  description: if nameSaveList does not exist, create a new save list
-                  example: nodejs
-      responses:
-        '200':
-          description: Save Post Successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessSavePostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  /post/unsave:
-    delete:
-      tags:
-      - Post
-      summary: Get Save Posts From SaveList
-      description: Get Save Posts From SaveList
-      operationId: savePostGET
-      parameters:
-        - in: query
-          name: postId
-          schema:
-            type: string
-          required: true
-          description: the postId that want to unsave out of saveList
-        - in: query
-          name: saveListId
-          schema:
-            type: string
-          required: true
-          description: the saveListId that want unsave post out
-      responses:
-        '200':
-          description: Get Saved Posts From Save List Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessUnsavePostResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    
-  
-  /post/save-posts/{saveListId}:
-    get:
-      tags:
-      - Post
-      summary: Get Save Posts From SaveList
-      description: Get Save Posts From SaveList
-      operationId: savePostsGET
-      parameters:
-        - in: path
-          name: saveListId
-          schema:
-            type: string
-          required: true
-      responses:
-        '200':
-          description: Get Saved Posts From Save List Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessGetSavedPostSuccess'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-  
-  /post/save-list:
-    get:
-      tags:
-      - Post
-      summary: Get Save List Of User
-      description: Get Save List Of User
-      operationId: savelistGET
-      responses:
-        '200':
-          description: Get Save List Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessGetSaveListResponse'
-        '400':
-          description: Invalid or missing infor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    $ref: "#/components/schemas/badRequestCode"
-                  message:
-                    type: string
-                    example: Please give more information
-        '401':
-          description: Authenticate Failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthFailResponse'
-    delete:
-        tags:
-        - Post
-        summary: Delete Save List
-        description: Delete Save List
-        operationId: savelistDELETE
-        responses:
-          '200':
-            description: Delete Savelist Successfully
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/SuccessDeleteSaveListResponse'
-          '400':
-            description: Invalid or missing infor
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    code:
-                      $ref: "#/components/schemas/badRequestCode"
-                    message:
-                      type: string
-                      example: Please give more information
-          '401':
-            description: Authenticate Failure
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/AuthFailResponse'
-  
-components:
-  schemas:
-    username:
-      type: string
-      description: the name that user want to use in the application
-      example: testUser01
-    email:
-      type: string
-      format: email
-      description: the user's email, it is need to verified in the future
-    password:
-      type: string
-      description: the password lenght is at least 8 character, must contains (Capital characters, Special Character and Number)
-      example: Pass#Word999
-    birth:
-      type: string
-      format: date
-      description: the user's birthday
-      example: 2000-01-01
-    
-    SignUpData:
-      type: object
-      properties:
-        username:
-          $ref: '#/components/schemas/username'
-        email:
-          $ref: '#/components/schemas/email'
+            description: the user's email, it is need to verified in the future
         password:
-          $ref: '#/components/schemas/password'
+            type: string
+            description: the password lenght is at least 8 character, must contains (Capital characters, Special Character and Number)
+            example: Pass#Word999
         birth:
-          $ref: '#/components/schemas/birth'
-    
-    LoginData:
-      type: object
-      properties:
-        username:
-          $ref: '#/components/schemas/username'
-        email:
-          $ref: '#/components/schemas/email'
-        password:
-          $ref: '#/components/schemas/password'
-    
-    SignUpSuccessData:
-      type: object
-      properties:
-        newUserId:
-          type: string
-    # response internal code
-    successCode:
-      type: integer
-      format: int64
-      description: Code descripts the api was executed successful
-      example: 10001
-    
-    authFailCode:
-      type: integer
-      format: int64
-      description: Code descripts the api was not authenticated
-      example: 10003
-      
-    badRequestCode:
-      type: integer
-      format: int64
-      description: Code descripts the api was not failure by input wrong
-      example: 10004 
-    
-    unknowCode:
-      type: integer
-      format: int64
-      description: Code descripts the unknow issue
-      example: 10007
-    
-    # response message
-    UserExistMessage:
-      type: string
-      description: the username or email was registered before
-      example: username or email exist
-    
-    UserAuthFailureMessage:
-      type: string
-      description: the input value was not authenticated
-      example: Authentication Failed
-      
-    MissingAccessInfoMessage:
-      type: string
-      description: call logout before log in to application
-      example: Missing Infor
-      
-    UnauthenticateUserMessage:
-      type: string
-      description: the access infor provided is invalid
-      example: invalid token
-      
-    SendMailWithCodeMessage:
-      type: string
-      description: Send Reset Url To User's Email Success
-      example: The Reset Url Was Send Successfully
-      
-    ResetPasswordSuccessMessage:
-      type: string
-      description: Password Was Reset Successfully
-      example: The Password Was Reset Successfully
-    
-    EmailNotRegisterMessage:
-      type: string
-      description: If user provide wrong email which is not registered yet
-      example: The email does not register yet
-      
-    GetOtherInforSuccessMessage:
-      type: string
-      description: Getting User infor Success
-      example: Getting User infor Success
-      
-    GetFriendsSuccessMessage:
-      type: string
-      description: Get List Friends Successfully
-      example: Get List Friends Successfully
-      
-    GetNotifiesSuccessMessage:
-      type: string
-      description: Get List Notifies Successfully
-      example: Get List Notifies Successfully
-      
-    PublishPostSuccessMesssage:
-      type: string
-      description: Publish Post Successfully
-      example: Publish New Post With Thumbnail Success!
+            type: string
+            format: date
+            description: the user's birthday
+            example: 2000-01-01
 
-    readPostSuccessMessage:
-      type: string
-      description: Read Post Success
-      example: Read Success!
-      
-    readAllMyPostSuccessMessage:
-      type: string
-      description: Read All My Post Success
-      example: Read All My Post Successfully
-      
-    readFeedSuccessMessage:
-      type: string
-      description: Read Feed Successfully
-      example: Read Feed Successfully
-    
-    # response object 
-    AuthSuccessResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          description: The text descripts the result of the Api
-          example: Registered Success!
-        metaData:
-          $ref: '#/components/schemas/SignUpSuccessData'
-    BadRequestResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/badRequestCode"
-        message:
-          $ref: "#/components/schemas/UserExistMessage"
-    AuthFailureResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/authFailCode"
-        message:
-          $ref: "#/components/schemas/UserAuthFailureMessage"
-    
-    LogoutSuccessResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          description: The text descripts the result of the Api
-          example: Logout Success!
-    
-    BadLogoutResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/badRequestCode"
-        message:
-          $ref: "#/components/schemas/MissingAccessInfoMessage"
-    
-    AuthFailLogoutResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/authFailCode"
-        message:
-          $ref: "#/components/schemas/UnauthenticateUserMessage"
-    
-    SuccessForgotPasswordResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/SendMailWithCodeMessage"
-    
-    SuccessResetPasswordResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/ResetPasswordSuccessMessage"
-    
-    BadForgotPasswordResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/badRequestCode"
-        message:
-          $ref: "#/components/schemas/EmailNotRegisterMessage"
-    
-    unauthenticatedUserResetPass:
-      type: object
-      description: Must provide the token with the new password
-      properties:
-        token:
-          type: string
-          description: The token was received from url which was sent to user's email
-          example: ABCDEF
-        newPassword:
-          type: string
-          example: newPassword#999
-        repeatPassword:
-          type: string
-          example: newPassword#999
-    
-    authenticatedUserResetPass:
-      type: object
-      properties:
-        newPassword:
-          type: string
-          example: newPassword#999
-        repeatPassword:
-          type: string
-          example: newPassword#999
-    
-    userId:
-      type: string
-      description: userId of current user
-    bio:
-      type: string
-      example: null
-    verified:
-          type: boolean
-          description: true if the user's email was verified, false if the email did not verify
-    oauth_provider:
-      type: boolean
-      description: true if this account is register by oauth (google, facebook or github)
-    AvatarUrl:
-      type: string
-      description: the avatar url null if user does not update
-    created_at:
-      type: string
-      format: date
-      description: the time account was created
-    updated_at:
-      type: string
-      format: date
-      description: the latest date, account was updated
-    # User
-    userInfor:
-      type: object
-      properties:
+        SignUpData:
+            type: object
+            properties:
+                username:
+                    $ref: '#/components/schemas/username'
+                email:
+                    $ref: '#/components/schemas/email'
+                password:
+                    $ref: '#/components/schemas/password'
+                birth:
+                    $ref: '#/components/schemas/birth'
+
+        LoginData:
+            type: object
+            properties:
+                username:
+                    $ref: '#/components/schemas/username'
+                email:
+                    $ref: '#/components/schemas/email'
+                password:
+                    $ref: '#/components/schemas/password'
+
+        SignUpSuccessData:
+            type: object
+            properties:
+                newUserId:
+                    type: string
+        # response internal code
+        successCode:
+            type: integer
+            format: int64
+            description: Code descripts the api was executed successful
+            example: 10001
+
+        authFailCode:
+            type: integer
+            format: int64
+            description: Code descripts the api was not authenticated
+            example: 10003
+
+        badRequestCode:
+            type: integer
+            format: int64
+            description: Code descripts the api was not failure by input wrong
+            example: 10004
+
+        unknowCode:
+            type: integer
+            format: int64
+            description: Code descripts the unknow issue
+            example: 10007
+
+        # response message
+        UserExistMessage:
+            type: string
+            description: the username or email was registered before
+            example: username or email exist
+
+        UserAuthFailureMessage:
+            type: string
+            description: the input value was not authenticated
+            example: Authentication Failed
+
+        MissingAccessInfoMessage:
+            type: string
+            description: call logout before log in to application
+            example: Missing Infor
+
+        UnauthenticateUserMessage:
+            type: string
+            description: the access infor provided is invalid
+            example: invalid token
+
+        SendMailWithCodeMessage:
+            type: string
+            description: Send Reset Url To User's Email Success
+            example: The Reset Url Was Send Successfully
+
+        ResetPasswordSuccessMessage:
+            type: string
+            description: Password Was Reset Successfully
+            example: The Password Was Reset Successfully
+
+        EmailNotRegisterMessage:
+            type: string
+            description: If user provide wrong email which is not registered yet
+            example: The email does not register yet
+
+        GetOtherInforSuccessMessage:
+            type: string
+            description: Getting User infor Success
+            example: Getting User infor Success
+
+        GetFriendsSuccessMessage:
+            type: string
+            description: Get List Friends Successfully
+            example: Get List Friends Successfully
+
+        GetNotifiesSuccessMessage:
+            type: string
+            description: Get List Notifies Successfully
+            example: Get List Notifies Successfully
+
+        PublishPostSuccessMesssage:
+            type: string
+            description: Publish Post Successfully
+            example: Publish New Post With Thumbnail Success!
+
+        readPostSuccessMessage:
+            type: string
+            description: Read Post Success
+            example: Read Success!
+
+        readAllMyPostSuccessMessage:
+            type: string
+            description: Read All My Post Success
+            example: Read All My Post Successfully
+
+        readFeedSuccessMessage:
+            type: string
+            description: Read Feed Successfully
+            example: Read Feed Successfully
+
+        # response object
+        AuthSuccessResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    description: The text descripts the result of the Api
+                    example: Registered Success!
+                metaData:
+                    $ref: '#/components/schemas/SignUpSuccessData'
+        BadRequestResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/badRequestCode'
+                message:
+                    $ref: '#/components/schemas/UserExistMessage'
+        AuthFailureResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/authFailCode'
+                message:
+                    $ref: '#/components/schemas/UserAuthFailureMessage'
+
+        LogoutSuccessResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    description: The text descripts the result of the Api
+                    example: Logout Success!
+
+        BadLogoutResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/badRequestCode'
+                message:
+                    $ref: '#/components/schemas/MissingAccessInfoMessage'
+
+        AuthFailLogoutResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/authFailCode'
+                message:
+                    $ref: '#/components/schemas/UnauthenticateUserMessage'
+
+        SuccessForgotPasswordResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/SendMailWithCodeMessage'
+
+        SuccessResetPasswordResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/ResetPasswordSuccessMessage'
+
+        BadForgotPasswordResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/badRequestCode'
+                message:
+                    $ref: '#/components/schemas/EmailNotRegisterMessage'
+
+        unauthenticatedUserResetPass:
+            type: object
+            description: Must provide the token with the new password
+            properties:
+                token:
+                    type: string
+                    description: The token was received from url which was sent to user's email
+                    example: ABCDEF
+                newPassword:
+                    type: string
+                    example: newPassword#999
+                repeatPassword:
+                    type: string
+                    example: newPassword#999
+
+        authenticatedUserResetPass:
+            type: object
+            properties:
+                newPassword:
+                    type: string
+                    example: newPassword#999
+                repeatPassword:
+                    type: string
+                    example: newPassword#999
+
         userId:
-          $ref: "#/components/schemas/userId"
-        userName:
-          $ref: "#/components/schemas/username"
-        email:
-          $ref: "#/components/schemas/email"
+            type: string
+            description: userId of current user
         bio:
-         $ref: "#/components/schemas/bio"
-        birthDay:
-          $ref: "#/components/schemas/birth"
+            type: string
+            example: null
         verified:
-          $ref: "#/components/schemas/verified"
+            type: boolean
+            description: true if the user's email was verified, false if the email did not verify
         oauth_provider:
-          $ref: "#/components/schemas/oauth_provider"
+            type: boolean
+            description: true if this account is register by oauth (google, facebook or github)
         AvatarUrl:
-          $ref: "#/components/schemas/AvatarUrl"
+            type: string
+            description: the avatar url null if user does not update
         created_at:
-          $ref: "#/components/schemas/created_at"
+            type: string
+            format: date
+            description: the time account was created
         updated_at:
-          $ref: "#/components/schemas/updated_at"
-    # Friend
-    friendInfo:
-      type: object
-      properties:
-        userId:
-          $ref: "#/components/schemas/userId"
-        userName:
-          $ref: "#/components/schemas/username"
-        avatar:
-          $ref: "#/components/schemas/AvatarUrl"
-    listFriend:
-      type: array
-      items:
-        $ref: "#/components/schemas/friendInfo"
-        
-    # Notify
-    sender:
-      type: object
-      properties:
-        userId:
-          $ref: "#/components/schemas/userId"
-        userName:
-          $ref: "#/components/schemas/username"
-        avatar:
-          $ref: "#/components/schemas/AvatarUrl"
-    
-    receiver:
-      type: object
-      properties:
-        userId:
-          $ref: "#/components/schemas/userId"
-        userName:
-          $ref: "#/components/schemas/username"
-        avatar:
-          $ref: "#/components/schemas/AvatarUrl"
+            type: string
+            format: date
+            description: the latest date, account was updated
+        # User
+        userInfor:
+            type: object
+            properties:
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                email:
+                    $ref: '#/components/schemas/email'
+                bio:
+                    $ref: '#/components/schemas/bio'
+                birthDay:
+                    $ref: '#/components/schemas/birth'
+                verified:
+                    $ref: '#/components/schemas/verified'
+                oauth_provider:
+                    $ref: '#/components/schemas/oauth_provider'
+                AvatarUrl:
+                    $ref: '#/components/schemas/AvatarUrl'
+                created_at:
+                    $ref: '#/components/schemas/created_at'
+                updated_at:
+                    $ref: '#/components/schemas/updated_at'
+        # Friend
+        friendInfo:
+            type: object
+            properties:
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                avatar:
+                    $ref: '#/components/schemas/AvatarUrl'
+        listFriend:
+            type: array
+            items:
+                $ref: '#/components/schemas/friendInfo'
 
-    requestFollowNotify:
-      type: object
-      properties:
-        _id:
-          type: string
-        typeNotify:
-          type: string
-          example: friendRequest
-        destinationSocket:
-          type: string
-          description: the socket where the notify sent to
-        notifyMessage:
-          type: string
-          example: testuser2 want to follow you
+        # Notify
         sender:
-          $ref: "#/components/schemas/sender"
+            type: object
+            properties:
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                avatar:
+                    $ref: '#/components/schemas/AvatarUrl'
+
         receiver:
-          $ref: "#/components/schemas/receiver"
-        status:
-          type: string
-          enum: ['Pending', 'Read', 'Received']
-        created_at:
-          $ref: "#/components/schemas/created_at"
-        updated_at:
-          $ref: "#/components/schemas/updated_at"
-
-    acceptedRequestNotify:
-      type: object
-      properties:
-        _id:
-          type: string
-        typeNotify:
-          type: string
-          example: acceptedRequest
-        destinationSocket:
-          type: string
-          description: the socket where the notify sent to
-        notifyMessage:
-          type: string
-          example: you and testuser2 are the friends now
-        sender:
-          $ref: "#/components/schemas/sender"
-        receiver:
-          $ref: "#/components/schemas/receiver"
-        status:
-          type: string
-          enum: ['Pending', 'Read', 'Received']
-        created_at:
-          $ref: "#/components/schemas/created_at"
-        updated_at:
-          $ref: "#/components/schemas/updated_at"
-        
-    listNotify:
-      type: array
-      items:
-        type: object
-      example: [$ref: "#/components/schemas/requestFollowNotify",
-                $ref: "#/components/schemas/acceptedRequestNotify"]
-        
-    AuthFailResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/authFailCode"
-        message:
-          $ref: "#/components/schemas/UnauthenticateUserMessage"
-    InternalServerResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/unknowCode"
-        message:
-          description: The Internal Server Error
-          example: Issue Happen When Get User Profile
-          
-    SuccessGetUserInforResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/GetOtherInforSuccessMessage"
-        metaData:
-          $ref: "#/components/schemas/userInfor"
-          
-    SuccessUpdateUserInforResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/GetOtherInforSuccessMessage"
-        metaData:
-          $ref: "#/components/schemas/userInfor"
-    
-    SuccessRequestVerifyResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example:  The Verify Code Was Sent Successfully
-          
-    SuccessFriendRequestResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example:  Your friend request was sent
-    
-    SuccessGetFriendsResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/GetFriendsSuccessMessage"
-        metaData:
-          $ref: "#/components/schemas/listFriend"
-      
-    SuccessGetNotifiesResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/GetNotifiesSuccessMessage"
-        metaData:
-          type: object
-          properties:
-            data:
-              $ref: "#/components/schemas/listNotify"
-            numberPending:
-              type: integer
-              example: 2
-            numberReceived:
-              type: integer
-              example: 0
-            numberRead:
-              type: integer
-              example: 0
-    
-    SuccessUnfriendResponse:
-      type: object
-      properties:
-        code:
-            $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example:  Unfriend Successfully
-    
-    SuccessUploadImageResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Uploaded a Image Success!
-        metaData:
-          type: string
-          example: http://localhost:3000/images/f32646cd-0884-4aab-a225-131630521cd8_1702981330678.png
-    #Post
-    postTittle:
-      type: string
-      description: title of the post
-      example: How to manage your time
-    
-    postStatus:
-      type: string
-      description: status of the post
-      enum: [publish, unpublish, draft]
-    
-    postCategory:
-      type: array
-      items:
-        type: string
-      example: ["Food", "Travel"]
-    
-    postPermit:
-      type: string
-      description: who can see this post
-      enum: [public, private, follower]
-    
-    postSummarize:
-      type: string
-      description: the summarize of the post
-      example: Everyone only have 24 hours a day, so that need to manage your time. Waste time like waste your life
-    
-    postContent:
-      type: string
-      description: the content of the post
-      example: |-
-        Inspiration for your time management journey is waiting. As you explore these Skillshare online classes, you’ll learn about a wide variety of tools, techniques, software, and topics, including productivity, and more. Whether you’re just getting started on your journey looking to learn how to motivate yourself, or you’re a professional looking for a refresher on how to use notion, you can improve your time management skills with classes taught by experienced experts and pros. With short lessons, hands-on projects, and support from a community of creators, these classes will take your abilities further.
-    
-    publishPostData:
-      type: object
-      properties:
-        postTittle:
-          $ref: "#/components/schemas/postTittle"
-        postStatus:
-          $ref: "#/components/schemas/postStatus"
-        postCategory:
-          $ref: "#/components/schemas/postCategory"
-        postPermit:
-          $ref: "#/components/schemas/postPermit"
-        postSummarize:
-          $ref: "#/components/schemas/postSummarize"
-        postContent:
-          $ref: "#/components/schemas/postContent"
-    publishPostMetaData:
-      type: object
-      properties:
-        newPostId:
-          type: string
-        thumbnail:
-          type: string
-          example: |- 
-            http://localhost:3000/images/4cfb8ca1-36ba-42fd-94f9-cc5dcf18ea3b_1702989316406.png
-    postId:
-      type: string
-      
-    thumbnailUrl:
-      type: string
-      example: |-
-        http://localhost:3000/images/c4576ac6-e3f2-4ad0-a234-b9d3c0da4169_1702991104225.png
-    title:
-      type: string
-      example: How to manage your time"
-    
-    statusEdit:
-      type: string
-      enum: [publish, unpublish, draft]
-    
-    sharePermission:
-      type: string
-      enum: [public, private, follower]
-
-  
-      
-    postData:
-      type: object
-      properties:
-        userId:
-          $ref: "#/components/schemas/userId"
-        userName:
-          $ref: "#/components/schemas/username"
-        avatarUrl:
-          $ref: "#/components/schemas/AvatarUrl"
-        postId:
-          $ref: "#/components/schemas/postId"
-        title:
-          $ref: "#/components/schemas/title"
-        thumbnailUrl:
-          $ref: "#/components/schemas/thumbnailUrl"
-        statusEdit:
-          $ref: "#/components/schemas/statusEdit"
-        sharePermission:
-          $ref: "#/components/schemas/sharePermission"
-        summarize:
-          $ref: "#/components/schemas/postSummarize"
-        content:
-          $ref: "#/components/schemas/postContent"
-        categrogies:
-          $ref: "#/components/schemas/postCategory"
-        created_at:
-          $ref: "#/components/schemas/created_at"
-        updated_at:
-          $ref: "#/components/schemas/updated_at"
-        
-    SuccessPublishNewPostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/PublishPostSuccessMesssage"
-        metaData:
-          $ref: "#/components/schemas/publishPostMetaData"
-    
-    SuccessReadPostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/readPostSuccessMessage"
-        metaData:
-          $ref: "#/components/schemas/postData"
-          
-    SuccessEditPostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Edit Successfully
-      
-    DeletePostSuccessResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Delete Post Successfull
-    
-    authorData:
-      type: object
-      properties:
-        userId:
-          $ref: "#/components/schemas/userId"
-        userName:
-          $ref: '#/components/schemas/username'
-        avatar:
-          $ref: "#/components/schemas/AvatarUrl"
-    
-    postElement1:
-      type: object
-      properties:
-        index:
-          type: integer
-          example: 0
-        author:
-          $ref: "#/components/schemas/authorData"
-        postData:
-          $ref: "#/components/schemas/postData"
-
-    allMyPostData:
-      type: object
-      properties:
-        numberPosts:
-          type: integer
-          example: 1
-        listPost:
-          type: array
-          items:
             type: object
-            $ref: "#/components/schemas/postElement1"
-            
-    parentComment:
-      type: object
-      properties:
-        content:
-          type: string
-          example: really nice post
-        numsLike:
-          type: integer
-          example: 3
-        childComment:
-          type: array
-          items: 
-            type: object
-          properties:
-            content:
-              type: string
-              example: Thanks You
-    
-    allCommentsData:
-      type: object
-      properties:
-        comments:
-          type: array
-          items:
-            type: object
-          example: [$ref: "#/components/schemas/parentComment"]
-      
-    SuccessGetAllMyPostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/readAllMyPostSuccessMessage"
-        metaData:
-          $ref: "#/components/schemas/allMyPostData"
-    
-    SuccessGetFeedResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          $ref: "#/components/schemas/readFeedSuccessMessage"
-        metaData:
-          $ref: "#/components/schemas/allMyPostData"
-    
-    SuccessDeleteAllMyPostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string 
-          example: Delete All My Posts Successfully
-    
-    SuccessCreateACommentResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string 
-          example: Comment Successful
-    
-    SuccessDeleteCommentResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string 
-          example: Delete Comment Successful
-  
-    SuccessEditCommentResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string 
-          example: Edit Comment Success
-    
-    SuccessGetCommentForPostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Read Comments For Post Success
-        metaData:
-          $ref: "#/components/schemas/allCommentsData"
-    
-    SuccessLikePostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Like Post Success
-          
-    SuccessUnLikePostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: UnLike Post Success
-    
-    saveSuccessMetaData:
-      type: object
-      properties:
-        saveListId:
-          type: string
-        nameSaveList:
-          type: string
-          example: nodejs
-        userId:
-          $ref: "#/components/schemas/postId"
-        created_at:
-          $ref: "#/components/schemas/created_at"
-        updated_at:
-          $ref: "#/components/schemas/updated_at"
-      
-    SuccessSavePostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Save Post Successfully
-        metaData:
-          $ref: "#/components/schemas/saveSuccessMetaData"
-  
-    SavedPost:
-      type: object
-      properties:
-        _index:
-          type: integer
-          example: 0
-        saveListId:
-          type: string
-        savedAt:
-          type: string
-          format: date
-        userId:
-          $ref: "#/components/schemas/userId"
-        userName:
-          $ref: "#/components/schemas/username"
-        bio:
-          $ref: "#/components/schemas/bio"
-        avatarUrl:
-          $ref: "#/components/schemas/AvatarUrl" 
-        postId:
-          $ref: "#/components/schemas/postId"
-        title:
-          $ref: "#/components/schemas/title"
-        summarize:
-          $ref: "#/components/schemas/postSummarize"
-        thumbnailUrl:
-          $ref: "#/components/schemas/thumbnailUrl"
+            properties:
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                avatar:
+                    $ref: '#/components/schemas/AvatarUrl'
 
-    SuccessGetSavedPostSuccess:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Save Post Successfully
-        metaData:
-          type: object
-          properties:
-            numPosts:
-              type: integer
-              example: 1
-            SavedPosts:
-              type: array
-              items:
+        requestFollowNotify:
+            type: object
+            properties:
+                _id:
+                    type: string
+                typeNotify:
+                    type: string
+                    example: friendRequest
+                destinationSocket:
+                    type: string
+                    description: the socket where the notify sent to
+                notifyMessage:
+                    type: string
+                    example: testuser2 want to follow you
+                sender:
+                    $ref: '#/components/schemas/sender'
+                receiver:
+                    $ref: '#/components/schemas/receiver'
+                status:
+                    type: string
+                    enum: ['Pending', 'Read', 'Received']
+                created_at:
+                    $ref: '#/components/schemas/created_at'
+                updated_at:
+                    $ref: '#/components/schemas/updated_at'
+
+        acceptedRequestNotify:
+            type: object
+            properties:
+                _id:
+                    type: string
+                typeNotify:
+                    type: string
+                    example: acceptedRequest
+                destinationSocket:
+                    type: string
+                    description: the socket where the notify sent to
+                notifyMessage:
+                    type: string
+                    example: you and testuser2 are the friends now
+                sender:
+                    $ref: '#/components/schemas/sender'
+                receiver:
+                    $ref: '#/components/schemas/receiver'
+                status:
+                    type: string
+                    enum: ['Pending', 'Read', 'Received']
+                created_at:
+                    $ref: '#/components/schemas/created_at'
+                updated_at:
+                    $ref: '#/components/schemas/updated_at'
+
+        listNotify:
+            type: array
+            items:
                 type: object
-              example: [$ref: "#/components/schemas/SavedPost"]
-    
-    saveList:
-      type: object
-      properties:
-        saveListId:
-          type: string
-        nameSaveList:
-          type: string
-          example: nodejs
-        created_at:
-          $ref: "#/components/schemas/created_at"
-        updated_at:
-          $ref: "#/components/schemas/updated_at"
-    
-    saveListData:
-      type: array
-      items:
-        type: object
-      example: [$ref: "#/components/schemas/saveList"]
-      
-    SuccessGetSaveListResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Get Save List Successfully
-        metaData:
-          $ref: "#/components/schemas/saveListData"
-    
-    SuccessDeleteSaveListResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Delete Save List Success
-    
-    SuccessUnsavePostResponse:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/successCode"
-        message:
-          type: string
-          example: Unsave Post Success
+            example:
+                [
+                    $ref: '#/components/schemas/requestFollowNotify',
+                    $ref: '#/components/schemas/acceptedRequestNotify',
+                ]
+
+        AuthFailResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/authFailCode'
+                message:
+                    $ref: '#/components/schemas/UnauthenticateUserMessage'
+        InternalServerResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/unknowCode'
+                message:
+                    description: The Internal Server Error
+                    example: Issue Happen When Get User Profile
+
+        SuccessGetUserInforResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/GetOtherInforSuccessMessage'
+                metaData:
+                    $ref: '#/components/schemas/userInfor'
+
+        SuccessUpdateUserInforResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/GetOtherInforSuccessMessage'
+                metaData:
+                    $ref: '#/components/schemas/userInfor'
+
+        SuccessRequestVerifyResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: The Verify Code Was Sent Successfully
+
+        SuccessFriendRequestResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Your friend request was sent
+
+        SuccessGetFriendsResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/GetFriendsSuccessMessage'
+                metaData:
+                    $ref: '#/components/schemas/listFriend'
+
+        SuccessGetNotifiesResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/GetNotifiesSuccessMessage'
+                metaData:
+                    type: object
+                    properties:
+                        data:
+                            $ref: '#/components/schemas/listNotify'
+                        numberPending:
+                            type: integer
+                            example: 2
+                        numberReceived:
+                            type: integer
+                            example: 0
+                        numberRead:
+                            type: integer
+                            example: 0
+
+        SuccessUnfriendResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Unfriend Successfully
+
+        SuccessUploadImageResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Uploaded a Image Success!
+                metaData:
+                    type: string
+                    example: http://localhost:3000/images/f32646cd-0884-4aab-a225-131630521cd8_1702981330678.png
+        #Post
+        postTittle:
+            type: string
+            description: title of the post
+            example: How to manage your time
+
+        postStatus:
+            type: string
+            description: status of the post
+            enum: [publish, unpublish, draft]
+
+        postCategory:
+            type: array
+            items:
+                type: string
+            example: ['Food', 'Travel']
+
+        postPermit:
+            type: string
+            description: who can see this post
+            enum: [public, private, follower]
+
+        postSummarize:
+            type: string
+            description: the summarize of the post
+            example: Everyone only have 24 hours a day, so that need to manage your time. Waste time like waste your life
+
+        postContent:
+            type: string
+            description: the content of the post
+            example: |-
+                Inspiration for your time management journey is waiting. As you explore these Skillshare online classes, you’ll learn about a wide variety of tools, techniques, software, and topics, including productivity, and more. Whether you’re just getting started on your journey looking to learn how to motivate yourself, or you’re a professional looking for a refresher on how to use notion, you can improve your time management skills with classes taught by experienced experts and pros. With short lessons, hands-on projects, and support from a community of creators, these classes will take your abilities further.
+
+        publishPostData:
+            type: object
+            properties:
+                postTittle:
+                    $ref: '#/components/schemas/postTittle'
+                postStatus:
+                    $ref: '#/components/schemas/postStatus'
+                postCategory:
+                    $ref: '#/components/schemas/postCategory'
+                postPermit:
+                    $ref: '#/components/schemas/postPermit'
+                postSummarize:
+                    $ref: '#/components/schemas/postSummarize'
+                postContent:
+                    $ref: '#/components/schemas/postContent'
+        publishPostMetaData:
+            type: object
+            properties:
+                newPostId:
+                    type: string
+                thumbnail:
+                    type: string
+                    example: |-
+                        http://localhost:3000/images/4cfb8ca1-36ba-42fd-94f9-cc5dcf18ea3b_1702989316406.png
+        postId:
+            type: string
+
+        thumbnailUrl:
+            type: string
+            example: |-
+                http://localhost:3000/images/c4576ac6-e3f2-4ad0-a234-b9d3c0da4169_1702991104225.png
+        title:
+            type: string
+            example: How to manage your time"
+
+        statusEdit:
+            type: string
+            enum: [publish, unpublish, draft]
+
+        sharePermission:
+            type: string
+            enum: [public, private, follower]
+
+        postData:
+            type: object
+            properties:
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                avatarUrl:
+                    $ref: '#/components/schemas/AvatarUrl'
+                postId:
+                    $ref: '#/components/schemas/postId'
+                title:
+                    $ref: '#/components/schemas/title'
+                thumbnailUrl:
+                    $ref: '#/components/schemas/thumbnailUrl'
+                statusEdit:
+                    $ref: '#/components/schemas/statusEdit'
+                sharePermission:
+                    $ref: '#/components/schemas/sharePermission'
+                summarize:
+                    $ref: '#/components/schemas/postSummarize'
+                content:
+                    $ref: '#/components/schemas/postContent'
+                categrogies:
+                    $ref: '#/components/schemas/postCategory'
+                created_at:
+                    $ref: '#/components/schemas/created_at'
+                updated_at:
+                    $ref: '#/components/schemas/updated_at'
+
+        SuccessPublishNewPostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/PublishPostSuccessMesssage'
+                metaData:
+                    $ref: '#/components/schemas/publishPostMetaData'
+
+        SuccessReadPostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/readPostSuccessMessage'
+                metaData:
+                    $ref: '#/components/schemas/postData'
+
+        SuccessEditPostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Edit Successfully
+
+        DeletePostSuccessResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Delete Post Successfull
+
+        authorData:
+            type: object
+            properties:
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                avatar:
+                    $ref: '#/components/schemas/AvatarUrl'
+
+        postElement1:
+            type: object
+            properties:
+                index:
+                    type: integer
+                    example: 0
+                author:
+                    $ref: '#/components/schemas/authorData'
+                postData:
+                    $ref: '#/components/schemas/postData'
+
+        allMyPostData:
+            type: object
+            properties:
+                numberPosts:
+                    type: integer
+                    example: 1
+                listPost:
+                    type: array
+                    items:
+                        type: object
+                        $ref: '#/components/schemas/postElement1'
+
+        parentComment:
+            type: object
+            properties:
+                content:
+                    type: string
+                    example: really nice post
+                numsLike:
+                    type: integer
+                    example: 3
+                childComment:
+                    type: array
+                    items:
+                        type: object
+                    properties:
+                        content:
+                            type: string
+                            example: Thanks You
+
+        allCommentsData:
+            type: object
+            properties:
+                comments:
+                    type: array
+                    items:
+                        type: object
+                    example: [$ref: '#/components/schemas/parentComment']
+
+        SuccessGetAllMyPostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/readAllMyPostSuccessMessage'
+                metaData:
+                    $ref: '#/components/schemas/allMyPostData'
+
+        SuccessGetFeedResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    $ref: '#/components/schemas/readFeedSuccessMessage'
+                metaData:
+                    $ref: '#/components/schemas/allMyPostData'
+
+        SuccessDeleteAllMyPostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Delete All My Posts Successfully
+
+        SuccessCreateACommentResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Comment Successful
+
+        SuccessDeleteCommentResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Delete Comment Successful
+
+        SuccessEditCommentResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Edit Comment Success
+
+        SuccessGetCommentForPostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Read Comments For Post Success
+                metaData:
+                    $ref: '#/components/schemas/allCommentsData'
+
+        SuccessLikePostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Like Post Success
+
+        SuccessUnLikePostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: UnLike Post Success
+
+        saveSuccessMetaData:
+            type: object
+            properties:
+                saveListId:
+                    type: string
+                nameSaveList:
+                    type: string
+                    example: nodejs
+                userId:
+                    $ref: '#/components/schemas/postId'
+                created_at:
+                    $ref: '#/components/schemas/created_at'
+                updated_at:
+                    $ref: '#/components/schemas/updated_at'
+
+        SuccessSavePostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Save Post Successfully
+                metaData:
+                    $ref: '#/components/schemas/saveSuccessMetaData'
+
+        SavedPost:
+            type: object
+            properties:
+                _index:
+                    type: integer
+                    example: 0
+                saveListId:
+                    type: string
+                savedAt:
+                    type: string
+                    format: date
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                bio:
+                    $ref: '#/components/schemas/bio'
+                avatarUrl:
+                    $ref: '#/components/schemas/AvatarUrl'
+                postId:
+                    $ref: '#/components/schemas/postId'
+                title:
+                    $ref: '#/components/schemas/title'
+                summarize:
+                    $ref: '#/components/schemas/postSummarize'
+                thumbnailUrl:
+                    $ref: '#/components/schemas/thumbnailUrl'
+
+        SuccessGetSavedPostSuccess:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Save Post Successfully
+                metaData:
+                    type: object
+                    properties:
+                        numPosts:
+                            type: integer
+                            example: 1
+                        SavedPosts:
+                            type: array
+                            items:
+                                type: object
+                            example: [$ref: '#/components/schemas/SavedPost']
+
+        saveList:
+            type: object
+            properties:
+                saveListId:
+                    type: string
+                nameSaveList:
+                    type: string
+                    example: nodejs
+                created_at:
+                    $ref: '#/components/schemas/created_at'
+                updated_at:
+                    $ref: '#/components/schemas/updated_at'
+
+        saveListData:
+            type: array
+            items:
+                type: object
+            example: [$ref: '#/components/schemas/saveList']
+
+        SuccessGetSaveListResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Get Save List Successfully
+                metaData:
+                    $ref: '#/components/schemas/saveListData'
+
+        SuccessDeleteSaveListResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Delete Save List Success
+
+        SuccessUnsavePostResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    example: Unsave Post Success
