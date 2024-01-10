@@ -43,4 +43,4 @@ jobs:
         mkdir -p tests/setupTest/mysqlData
 
     - run: npm install
-    - run: npm test /tests/authentication/signup.test.js
+    - run: npm test
