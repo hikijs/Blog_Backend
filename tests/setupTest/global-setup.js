@@ -11,7 +11,7 @@ const CONTAINER = {
 	{
 		name: 'mysql_test',
 		timeout: 60,
-		confirmString: '/usr/sbin/mysqld: ready for connections',
+		confirmString: 'MySQL init process done. Ready for start up',
 	},
 	RABBITMQ: {
 		name: 'rabbitmq_test',
