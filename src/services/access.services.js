@@ -90,12 +90,7 @@ class AccessService {
 			);
 			await TransactionQuery.commitTransaction();
 			return {
-				newUserId: newUser,
-				newTokens: {
-					publicKey: publicKey,
-					accessKey: tokens.accessToken,
-					refreshKey: tokens.refreshToken,
-				},
+				newUserId: newUser
 			};
 		} catch (error) {
 			await TransactionQuery.rollBackTransaction();
@@ -157,11 +152,7 @@ class AccessService {
 		);
 		console.log(`The new key has been added ${newKey}`);
 		const metaData = {
-			userId: instanceId,
-			newTokens: {
-				accessKey: tokens.accessToken,
-				refreshKey: tokens.refreshToken,
-			},
+			userId: instanceId
 		};
 		createCookiesAuthen(
 			res,

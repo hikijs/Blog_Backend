@@ -373,11 +373,6 @@ describe('APIs Authentication Basic', () => {
 			const { message, metaData } = response.data;
 			expect(message).toEqual('Registered Success!');
 			expect(metaData.newUserId).toHaveLength(36);
-			const { newTokens } = metaData;
-			const { publicKey, accessKey, refreshKey } = newTokens;
-			expect(publicKey).toMatch(PUBLICKEY_REGEX);
-			expect(accessKey).toMatch(JWT_REGEX);
-			expect(refreshKey).toMatch(JWT_REGEX);
 		});
 
 		test('Register Success For User2', async () => {
@@ -391,11 +386,6 @@ describe('APIs Authentication Basic', () => {
 			const { message, metaData } = response.data;
 			expect(message).toEqual('Registered Success!');
 			expect(metaData.newUserId).toHaveLength(36);
-			const { newTokens } = metaData;
-			const { publicKey, accessKey, refreshKey } = newTokens;
-			expect(publicKey).toMatch(PUBLICKEY_REGEX);
-			expect(accessKey).toMatch(JWT_REGEX);
-			expect(refreshKey).toMatch(JWT_REGEX);
 		});
 		beforeAll(async () => {
 			await UserQuery.deleteUserByUserName(correctUsers.user1.username);
