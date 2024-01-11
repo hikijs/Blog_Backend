@@ -39,7 +39,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/AuthSuccessResponse'
+                                $ref: '#/components/schemas/AuthRegSuccessResponse'
                 '400':
                     description: Missing Information Or User Existed
                     content:
@@ -50,23 +50,28 @@ paths:
         post:
             tags:
                 - Authentication
-            summary: Authenticates a User to the application
-            description: User can authenticate after registration,
+            summary: Log in a User to the application
+            description: User can log into the application after registration,
             operationId: loginUsingPOST
             requestBody:
-                description: User must provide bellow infor for log in to application
+                description: |
+                    User must provide bellow infor for log in to application
+                    * For case login by username, user must provide username and password
+                    * For case login by email, user must provide email and password
                 required: true
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/LoginData'
+                            anyOf:
+                                - $ref: '#/components/schemas/LoginByUserNameData'
+                                - $ref: '#/components/schemas/LoginByEmailData'
             responses:
                 '200':
                     description: Created
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/AuthSuccessResponse'
+                                $ref: '#/components/schemas/AuthLoginSuccessResponse'
                 '400':
                     description: Missing Information
                     content:
@@ -1440,7 +1445,7 @@ components:
             type: string
             format: date
             description: the user's birthday
-            example: 2000-01-01
+            example: "2000-01-01"
 
         SignUpData:
             type: object
@@ -1454,17 +1459,23 @@ components:
                 birth:
                     $ref: '#/components/schemas/birth'
 
-        LoginData:
+        LoginByUserNameData:
             type: object
             properties:
                 username:
                     $ref: '#/components/schemas/username'
+                password:
+                    $ref: '#/components/schemas/password'
+
+        LoginByEmailData:
+            type: object
+            properties:
                 email:
                     $ref: '#/components/schemas/email'
                 password:
                     $ref: '#/components/schemas/password'
 
-        SignUpSuccessData:
+        AuthSuccessData:
             type: object
             properties:
                 newUserId:
@@ -1566,7 +1577,7 @@ components:
             example: Read Feed Successfully
 
         # response object
-        AuthSuccessResponse:
+        AuthRegSuccessResponse:
             type: object
             properties:
                 code:
@@ -1576,7 +1587,19 @@ components:
                     description: The text descripts the result of the Api
                     example: Registered Success!
                 metaData:
-                    $ref: '#/components/schemas/SignUpSuccessData'
+                    $ref: '#/components/schemas/AuthSuccessData'
+
+        AuthLoginSuccessResponse:
+            type: object
+            properties:
+                code:
+                    $ref: '#/components/schemas/successCode'
+                message:
+                    type: string
+                    description: The text descripts the result of the Api
+                    example: Login Success!
+                metaData:
+                    $ref: '#/components/schemas/AuthSuccessData'
         BadRequestResponse:
             type: object
             properties:
