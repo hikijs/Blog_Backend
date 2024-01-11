@@ -31,6 +31,6 @@ router.post(
 router.use(authentication);
 // logout
 router.get('/ping', asyncHanlder(accessController.ping));
-router.post('/logout', asyncHanlder(accessController.logout));
+router.delete('/logout', asyncHanlder(accessController.logout));
 
 module.exports = router;
