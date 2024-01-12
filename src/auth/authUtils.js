@@ -30,7 +30,8 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
 	}
 };
 
-const authentication = asyncHanlder(async (req, res, next) => {
+
+const isAuthenticatedUser = async (req) => {
 	/*
         1. check userId misisng or not 
         2. get accesstonken
@@ -39,46 +40,38 @@ const authentication = asyncHanlder(async (req, res, next) => {
         5. check keyStore with user
         6. oke all => return next()
     */
-
-	const { accessToken, userId } = req.cookies;
-	//1
-	if (!userId) {
-		throw new AuthFailureError({
-			message: 'Invalid Request',
-		});
-	}
-	let keyStore = null;
 	try {
+		const { accessToken, userId } = req.cookies;
+		if (!userId || !accessToken) {
+			throw new Error('Missing Cookies');
+		}
+		let keyStore = null;
 		keyStore = await KeyStoreQuery.getKeyStore(userId);
 		if (keyStore == null) {
-			throw new AuthFailureError({
-				message: 'Invalid Request',
-			});
+			throw new Error('Can not find keyStore');
 		}
-		//3
-		if (!accessToken) {
-			throw new AuthFailureError({
-				message: 'Invalid Request',
-			});
-		}
-	} catch (error) {
-		throw new AuthFailureError({
-			message: 'Issue happen when get authen infor',
-		});
-	}
-
-	try {
 		const decodeUser = JWT.verify(accessToken, keyStore.privateKey);
 		if (userId !== decodeUser.userId) {
-			throw new AuthFailureError({
-				message: 'Not Authenticate User',
-			});
+			throw new Error('Not Authenticate User');
 		}
 		req.keyStore = keyStore;
+		return true;
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
+};
+
+const authentication = asyncHanlder(async (req, res, next) => {
+	try {
+		if(!await isAuthenticatedUser(req))
+		{
+			throw new Error('Invalid Request');
+		}
 		next();
 	} catch (error) {
 		throw new AuthFailureError({
-			message: 'Invalid Token',
+			message: 'Invalid Request',
 		});
 	}
 });
@@ -113,4 +106,6 @@ const verifyResetPassword = asyncHanlder(async (req, res, next) => {
 	next();
 });
 
-module.exports = { createTokenPair, authentication, verifyResetPassword };
+
+
+module.exports = { createTokenPair, authentication, verifyResetPassword, isAuthenticatedUser };

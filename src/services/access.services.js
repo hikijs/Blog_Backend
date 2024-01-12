@@ -6,7 +6,7 @@ const {
 const KeyStoreQuery = require('../dbs/keystore.mysql');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const { createTokenPair } = require('../auth/authUtils');
+const { createTokenPair, isAuthenticatedUser } = require('../auth/authUtils');
 const { BadRequestError, AuthFailureError } = require('../core/error.response');
 const VerifyCodeQuery = require('../dbs/verifyCode.mysql');
 const { generateVerificationCode } = require('../helpers/randomCode');
@@ -40,6 +40,53 @@ const {
 	createCookiesVerifyCode,
 	createCookiesResetPasswordSuccess,
 } = require('../cookies/createCookies');
+
+const changePassword = async (newPassword, confirmPassword, userId, resetCode = null) => {
+	if(resetCode)
+	{
+		// check reset token exist or not
+		const codeExisting = await VerifyCodeQuery.checkCodeExistOrNot(
+			resetCode,
+			userId,
+			VERIFYCODE_TYPE.FORGOT_PASSWORD
+		);
+		if (codeExisting == null) {
+			throw new BadRequestError({
+				message: 'Incorrect Code Please Fill Again',
+			});
+		}
+	}
+	if (!newPassword || !confirmPassword) {
+		throw new BadRequestError({
+			message: 'Not enough information request',
+		});
+	}
+	if (newPassword !== confirmPassword) {
+		throw new BadRequestError({
+			message: 'Both Password does not match together',
+		});
+	}
+
+	const passwordHashed = await bcrypt.hash(newPassword, 10);
+	try {
+		await TransactionQuery.startTransaction();
+		await UserQuery.updatePassword(passwordHashed, userId);
+		if(resetCode != null)
+		{
+			await VerifyCodeQuery.deleteVerifyCode(
+				resetCode,
+				userId,
+				VERIFYCODE_TYPE.FORGOT_PASSWORD
+			);
+		}
+		await TransactionQuery.commitTransaction();
+	} catch (error) {
+		await TransactionQuery.rollBackTransaction();
+		throw new BadRequestError({
+			message: 'Update password is not successfull',
+		});
+	}
+};
 class AccessService {
 	//1. Check username and email does not exist in the database
 	//2. Hashing password
@@ -538,89 +585,73 @@ class AccessService {
 		}
 	};
 
-	static forgotPassword = async (req, res) => {
-		//1. check mail exist or not in body
-		const email = req.body.email;
-		if (!email) {
-			throw new BadRequestError({
-				message: 'Missing Email Address',
-			});
-		}
-		//2. check mail exist or not in the db
-		const userExist = await UserQuery.getNonOauthUserByMail(email);
-		if (!userExist) {
-			throw new BadRequestError({
-				message: 'The email does not register yet',
-			});
-		}
-		//3. create new token
-		// Generate a unique token
-		const code = generateVerificationCode();
-		const codeExpiry = Date.now() + TIMEOUT.verifyCode; // Token expires in 1 hour
-		await VerifyCodeQuery.createNewVerifyCode(
-			code,
-			codeExpiry,
-			VERIFYCODE_TYPE.FORGOT_PASSWORD,
-			userExist.userId
-		);
-		mailTransport.send(email, 'reset code', code);
-		createCookiesForgotPassword(res, userExist.userId);
-		return {};
-	};
-
-	static forgotPasswordVerify = async (req, res) => {
-		// FIXME because useId is depend on the cookies that lead to can not reset on another device
-		const code = req.params.verifyCode;
-		const userId = req.cookies.userId;
-		const metaData = {};
-		const existingCode = await VerifyCodeQuery.checkCodeExistOrNot(
-			code,
-			userId,
-			VERIFYCODE_TYPE.FORGOT_PASSWORD
-		);
-		if (existingCode != null) {
-			createCookiesVerifyCode(res, code);
-		} else {
-			throw new BadRequestError({
-				message: 'Incorrect Code Please Fill Again',
-			});
-		}
-
-		return { metaData };
-	};
-
-	static resetPassword = async (req, res) => {
-		// check password new and confirm exist
-		const userId = req.cookies.userId;
-		const verifyCode = req.cookies.verifyCode;
-		const { newPassword, confirmPassword } = req.body;
-		if (!newPassword || !confirmPassword) {
-			throw new BadRequestError({
-				message: 'Not enough information request',
-			});
-		}
-		// check password new and confirm matched
-		if (newPassword !== confirmPassword) {
-			throw new BadRequestError({
-				message: 'Both Password does not match together',
-			});
-		}
-
-		const passwordHashed = await bcrypt.hash(newPassword, 10);
+	static updatePassword = async (req, res) => {
 		try {
-			await UserQuery.updatePassword(passwordHashed, userId);
-			await VerifyCodeQuery.deleteVerifyCode(
-				verifyCode,
-				userId,
-				VERIFYCODE_TYPE.FORGOT_PASSWORD
-			);
+			let message = null;
+			if(await isAuthenticatedUser(req))
+			{
+				const {userId} = req.keyStore;
+				if(!userId)
+				{
+					throw new BadRequestError({
+						message: 'Not enough information request',
+					});
+				}
+				// handling for user authenticated
+				const {resetToken, newPassword, confirmPassword} = req.body;
+				if(resetToken)
+				{
+					throw new BadRequestError({
+						message: 'Redundant information request',
+					});
+				}
+				await changePassword(newPassword, confirmPassword, userId);
+				message = 'Update Password Success';
+				return message;
+			}
+			else
+			{
+				const { email } = req.query;
+				if(email)
+				{
+					const userExist = await UserQuery.getNonOauthUserByMail(email);
+					if (!userExist) {
+						throw new BadRequestError({
+							message: 'The email does not register yet',
+						});
+					}
+					const resetCode = generateVerificationCode();
+					const codeExpiry = Date.now() + TIMEOUT.verifyCode; // Token expires in 1 hour
+					await VerifyCodeQuery.createNewVerifyCode(
+						resetCode,
+						codeExpiry,
+						VERIFYCODE_TYPE.FORGOT_PASSWORD,
+						userExist.userId
+					);
+					const resetUrl = 'http://localhost:3001/reset-password/' + userExist.userId + '@' + resetCode;
+					mailTransport.send(email, 'reset link', resetUrl);
+					message = 'Send Reset Url Success';
+					return message;
+				}
+				else // handling for case reset password
+				{
+					const {resetToken, newPassword, confirmPassword} = req.body;
+					if(!resetToken)
+					{
+						throw new BadRequestError({
+							message: 'Not enough information request',
+						});
+					}
+					const [userId, resetCode] = resetToken.split('@');
+					// checking matching token reset password
+					await changePassword(newPassword, confirmPassword, userId, resetCode);
+					message = 'Reset Password Success';
+					return message;
+				}
+			}
 		} catch (error) {
-			throw new BadRequestError({
-				message: 'Update password is not successful',
-			});
+			throw new BadRequestError({	message: error.message });
 		}
-		createCookiesResetPasswordSuccess(res);
-		return 'Update Password Success';
 	};
 }
 
