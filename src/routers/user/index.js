@@ -9,12 +9,8 @@ require('dotenv').config();
 
 router.use(authentication);
 
-// logout api
-router.get('/myProfile', asyncHanlder(UserController.getMyProfile));
-router.get('/getInfo/:userId', asyncHanlder(UserController.getUserInfo));
-
-router.put('/updateProfile', asyncHanlder(UserController.updateProfile));
-router.delete('/deleteProfile', asyncHanlder(UserController.deleteProfile));
+// get my profile
+router.get('/my-profile', asyncHanlder(UserController.getMyProfile));
 
 router.post('/verify', asyncHanlder(UserController.verifyEmailForUser));
 router.post(
@@ -27,6 +23,7 @@ router.post(
 	'/friend_request/:friendId',
 	asyncHanlder(UserController.friendRequest)
 );
+
 router.post(
 	'/answere_request/:requesterId',
 	asyncHanlder(UserController.answereRequest)
@@ -51,5 +48,10 @@ router.get(
 	'/recommendFollowing',
 	asyncHanlder(UserController.getRecommendFollowings)
 );
+
+// general routes should be here
+router.get('/:userId', asyncHanlder(UserController.getUserInfo));
+router.put('/:userId', asyncHanlder(UserController.updateProfile));
+router.delete('/:userId', asyncHanlder(UserController.deleteProfile));
 
 module.exports = router;
