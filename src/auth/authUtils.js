@@ -30,7 +30,6 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
 	}
 };
 
-
 const isAuthenticatedUser = async (req) => {
 	/*
         1. check userId misisng or not 
@@ -64,8 +63,7 @@ const isAuthenticatedUser = async (req) => {
 
 const authentication = asyncHanlder(async (req, res, next) => {
 	try {
-		if(!await isAuthenticatedUser(req))
-		{
+		if (!(await isAuthenticatedUser(req))) {
 			throw new Error('Invalid Request');
 		}
 		next();
@@ -106,6 +104,9 @@ const verifyResetPassword = asyncHanlder(async (req, res, next) => {
 	next();
 });
 
-
-
-module.exports = { createTokenPair, authentication, verifyResetPassword, isAuthenticatedUser };
+module.exports = {
+	createTokenPair,
+	authentication,
+	verifyResetPassword,
+	isAuthenticatedUser,
+};

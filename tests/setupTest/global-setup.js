@@ -7,8 +7,7 @@ require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
 const { initializeDatabase } = require('../../src/dbs/setupDatabase');
 const Docker = require('dockerode');
 const CONTAINER = {
-	MYSQL: 
-	{
+	MYSQL: {
 		name: 'mysql_test',
 		timeout: 60,
 		confirmString: 'MySQL init process done. Ready for start up',
@@ -17,12 +16,12 @@ const CONTAINER = {
 		name: 'rabbitmq_test',
 		timeout: 60,
 		confirmString: 'Server startup complete',
-	}
+	},
 };
 
-async function resetMysqlData()
-{
+async function resetMysqlData() {
 	console.log('===>  CLEAN MYSQL DATA <===');
+	// eslint-disable-next-line no-undef
 	const mysqlDataFolder = path.join(__dirname, 'mysqlData');
 	execSync(`rm -rf ${mysqlDataFolder}`);
 	execSync(`mkdir ${mysqlDataFolder}`);
@@ -34,54 +33,56 @@ async function followLogsContainer(monitorContainer) {
 		const docker = new Docker();
 		// Get the container by name
 		const container = docker.getContainer(monitorContainer.name);
-		
+
 		// Stream logs from the container in real-time
-		container.logs({
-			follow: true,
-			stdout: true,
-			stderr: true
-		}, (err, stream) => {
-			let counter = monitorContainer.timeout;
-			const timeout = setInterval(() => {
-				counter--;
-				if (counter === 0) {
-					clearInterval(timeout);
-					reject('Set up db time out');
-				}
-			}, 1000);
+		container.logs(
+			{
+				follow: true,
+				stdout: true,
+				stderr: true,
+			},
+			(err, stream) => {
+				let counter = monitorContainer.timeout;
+				const timeout = setInterval(() => {
+					counter--;
+					if (counter === 0) {
+						clearInterval(timeout);
+						reject('Set up db time out');
+					}
+				}, 1000);
 
-			if (err) {
-				console.error('Error streaming logs:', err.message);
-				clearInterval(timeout); // Clear the timeout if there is an error
-				reject(err);
-				return;
+				if (err) {
+					console.error('Error streaming logs:', err.message);
+					clearInterval(timeout); // Clear the timeout if there is an error
+					reject(err);
+					return;
+				}
+
+				// Handle log data
+				stream.on('data', (data) => {
+					const log = data.toString('utf8');
+					if (log.includes(monitorContainer.confirmString)) {
+						clearInterval(timeout); // Clear the timeout if the condition is met
+						stream.destroy(); // stop following the logs
+						resolve();
+					}
+				});
+
+				// Handle stream closure
+				stream.on('end', () => {
+					console.log('Log stream mysql2 closed.');
+				});
+
+				// Handle stream error
+				stream.on('error', (error) => {
+					console.error('Error in log stream:', error.message);
+					clearInterval(timeout); // Clear the timeout if there is an error
+					reject(error);
+				});
 			}
-
-			// Handle log data
-			stream.on('data', (data) => {
-				const log = data.toString('utf8');
-				if (log.includes(monitorContainer.confirmString)){
-					clearInterval(timeout); // Clear the timeout if the condition is met
-					stream.destroy(); // stop following the logs
-					resolve();
-				}
-			});
-
-			// Handle stream closure
-			stream.on('end', () => {
-				console.log('Log stream mysql2 closed.');
-			});
-
-			// Handle stream error
-			stream.on('error', (error) => {
-				console.error('Error in log stream:', error.message);
-				clearInterval(timeout); // Clear the timeout if there is an error
-				reject(error);
-			});
-		});
+		);
 	});
 }
-
 
 async function isDbCanConnect() {
 	return new Promise((resolve, reject) => {
@@ -105,7 +106,9 @@ async function isDbCanConnect() {
 
 function isDockerComposeRunning() {
 	try {
-		execSync('docker ps | grep "mysql_test\\|rabbitmq_test\\|utils_test\\|phpmyadmin_test"');
+		execSync(
+			'docker ps | grep "mysql_test\\|rabbitmq_test\\|utils_test\\|phpmyadmin_test"'
+		);
 		return true;
 	} catch (error) {
 		return false;
@@ -133,7 +136,7 @@ module.exports = async () => {
 		console.error(`!! Can not start docker compose ${error}`);
 		throw new Error(error);
 	}
-	
+
 	try {
 		const mysqlDone = followLogsContainer(CONTAINER.MYSQL);
 		const rabbitMqDone = followLogsContainer(CONTAINER.RABBITMQ);

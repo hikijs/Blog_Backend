@@ -16,8 +16,7 @@ const Validator = (template) => {
 			let options = {};
 			const { schema } = template;
 			let source = template.source;
-			if(typeof source !== 'string')
-			{
+			if (typeof source !== 'string') {
 				source = ValidationSource.FLEX;
 			}
 
@@ -28,10 +27,8 @@ const Validator = (template) => {
 			// eslint-disable-next-line no-inner-declarations
 			function sourceFex(req, sources) {
 				let result = {};
-				for(let source of sources)
-				{
-					if(!(Object.keys(req[source]).length == 0))
-					{
+				for (let source of sources) {
+					if (!(Object.keys(req[source]).length == 0)) {
 						result[source] = req[source];
 					}
 				}
@@ -40,9 +37,11 @@ const Validator = (template) => {
 			}
 
 			const { error } = schema.validate(
-				source != ValidationSource.FLEX? req[source] : 
-				sourceFex(req, template.source),
-				options);
+				source != ValidationSource.FLEX
+					? req[source]
+					: sourceFex(req, template.source),
+				options
+			);
 			// pass validator if there is no error
 			if (!error) return next();
 			const { details } = error;

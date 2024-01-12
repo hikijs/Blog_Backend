@@ -93,7 +93,7 @@ class AccessController {
 	updatePassword = async (req, res, next) => {
 		const message = await AccessService.updatePassword(req, res);
 		new OK({
-			message: message
+			message: message,
 		}).send(res);
 	};
 

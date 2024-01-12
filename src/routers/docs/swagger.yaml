@@ -1445,7 +1445,7 @@ components:
             type: string
             format: date
             description: the user's birthday
-            example: "2000-01-01"
+            example: '2000-01-01'
 
         SignUpData:
             type: object

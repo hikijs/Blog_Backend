@@ -36,14 +36,15 @@ const ImageData = require('../dbs/image.mysql');
 const {
 	createCookiesAuthen,
 	createCookiesLogout,
-	createCookiesForgotPassword,
-	createCookiesVerifyCode,
-	createCookiesResetPasswordSuccess,
 } = require('../cookies/createCookies');
 
-const changePassword = async (newPassword, confirmPassword, userId, resetCode = null) => {
-	if(resetCode)
-	{
+const changePassword = async (
+	newPassword,
+	confirmPassword,
+	userId,
+	resetCode = null
+) => {
+	if (resetCode) {
 		// check reset token exist or not
 		const codeExisting = await VerifyCodeQuery.checkCodeExistOrNot(
 			resetCode,
@@ -71,8 +72,7 @@ const changePassword = async (newPassword, confirmPassword, userId, resetCode = 
 	try {
 		await TransactionQuery.startTransaction();
 		await UserQuery.updatePassword(passwordHashed, userId);
-		if(resetCode != null)
-		{
+		if (resetCode != null) {
 			await VerifyCodeQuery.deleteVerifyCode(
 				resetCode,
 				userId,
@@ -137,7 +137,7 @@ class AccessService {
 			);
 			await TransactionQuery.commitTransaction();
 			return {
-				newUserId: newUser
+				newUserId: newUser,
 			};
 		} catch (error) {
 			await TransactionQuery.rollBackTransaction();
@@ -199,7 +199,7 @@ class AccessService {
 		);
 		console.log(`The new key has been added ${newKey}`);
 		const metaData = {
-			userId: instanceId
+			userId: instanceId,
 		};
 		createCookiesAuthen(
 			res,
@@ -585,22 +585,20 @@ class AccessService {
 		}
 	};
 
+	// eslint-disable-next-line no-unused-vars
 	static updatePassword = async (req, res) => {
 		try {
 			let message = null;
-			if(await isAuthenticatedUser(req))
-			{
-				const {userId} = req.keyStore;
-				if(!userId)
-				{
+			if (await isAuthenticatedUser(req)) {
+				const { userId } = req.keyStore;
+				if (!userId) {
 					throw new BadRequestError({
 						message: 'Not enough information request',
 					});
 				}
 				// handling for user authenticated
-				const {resetToken, newPassword, confirmPassword} = req.body;
-				if(resetToken)
-				{
+				const { resetToken, newPassword, confirmPassword } = req.body;
+				if (resetToken) {
 					throw new BadRequestError({
 						message: 'Redundant information request',
 					});
@@ -608,13 +606,11 @@ class AccessService {
 				await changePassword(newPassword, confirmPassword, userId);
 				message = 'Update Password Success';
 				return message;
-			}
-			else
-			{
+			} else {
 				const { email } = req.query;
-				if(email)
-				{
-					const userExist = await UserQuery.getNonOauthUserByMail(email);
+				if (email) {
+					const userExist =
+						await UserQuery.getNonOauthUserByMail(email);
 					if (!userExist) {
 						throw new BadRequestError({
 							message: 'The email does not register yet',
@@ -628,29 +624,37 @@ class AccessService {
 						VERIFYCODE_TYPE.FORGOT_PASSWORD,
 						userExist.userId
 					);
-					const resetUrl = 'http://localhost:3001/reset-password/' + userExist.userId + '@' + resetCode;
+					const resetUrl =
+						'http://localhost:3001/reset-password/' +
+						userExist.userId +
+						'@' +
+						resetCode;
 					mailTransport.send(email, 'reset link', resetUrl);
 					message = 'Send Reset Url Success';
 					return message;
-				}
-				else // handling for case reset password
-				{
-					const {resetToken, newPassword, confirmPassword} = req.body;
-					if(!resetToken)
-					{
+				} // handling for case reset password
+				else {
+					const { resetToken, newPassword, confirmPassword } =
+						req.body;
+					if (!resetToken) {
 						throw new BadRequestError({
 							message: 'Not enough information request',
 						});
 					}
 					const [userId, resetCode] = resetToken.split('@');
 					// checking matching token reset password
-					await changePassword(newPassword, confirmPassword, userId, resetCode);
+					await changePassword(
+						newPassword,
+						confirmPassword,
+						userId,
+						resetCode
+					);
 					message = 'Reset Password Success';
 					return message;
 				}
 			}
 		} catch (error) {
-			throw new BadRequestError({	message: error.message });
+			throw new BadRequestError({ message: error.message });
 		}
 	};
 }
