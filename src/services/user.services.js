@@ -103,7 +103,7 @@ class UserService {
 				VERIFYCODE_TYPE.VERIFY_EMAIL,
 				userData.userId
 			);
-			mailTransport.send(userData.email, 'reset code', code);
+			await mailTransport.send(userData.email, 'reset code', code);
 			const metaData = {
 				link: `http://localhost:3000/v1/api/user/auth/verify/${code}`,
 			};

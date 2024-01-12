@@ -629,7 +629,7 @@ class AccessService {
 						userExist.userId +
 						'@' +
 						resetCode;
-					mailTransport.send(email, 'reset link', resetUrl);
+					await mailTransport.send(email, 'reset link', resetUrl);
 					message = 'Send Reset Url Success';
 					return message;
 				} // handling for case reset password
