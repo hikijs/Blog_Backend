@@ -32,8 +32,9 @@ class OK extends SuccessResponse {
 		message = null,
 		metaData,
 		internalCode = InternalCode.SUCCESS,
+		customStatus = HttpStatus._2xx.OK,
 	}) {
-		const { statusCode, reason } = HttpStatus._2xx.OK;
+		const { statusCode, reason } = customStatus;
 		if (!message) {
 			message = reason;
 		}
@@ -54,6 +55,7 @@ class CREATED extends SuccessResponse {
 		super({ statusCode, internalCode, message, metaData });
 	}
 }
+
 class REDIRECT extends SuccessResponse {
 	constructor({
 		message = null,

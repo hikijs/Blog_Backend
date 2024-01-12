@@ -115,12 +115,11 @@ paths:
         put:
             tags:
                 - Authentication
-            summary: Suppport reset password for both unauthenticated and authenticated user
+            summary: Support change password authenticated user and reset password unauthenticated user
             description: |-
-                * For Unathenticated User, need call this api with query email= {user's email}
-                then the reset password url within token will be sent direct to user's email. When follow this url
-                the user can reset password
-                * For Authenticated User, we does not need the query email, user can resset password directly
+                * For Unathenticated User, need add email to query then user will receive a reset token in email
+                follow the url to reset password. When reset password should put a resetToken to the body.
+                * For Authenticated User, we does not need the query email, user can reset password directly.
             parameters:
                 - in: query
                   name: email
@@ -130,8 +129,8 @@ paths:
                   description: User forgot password need provide registered email in the query
             requestBody:
                 description: |-
-                    * for case unauthenticated user, user must provide key and new password
-                    * for case authenticated user, user need provide old and new password
+                    * for case unauthenticated user, user must provide resetToken, newPassword and confirmPassword
+                    * for case authenticated user, user need provide newPassword and confirmPassword
                 required: false
                 content:
                     application/json:
@@ -149,10 +148,6 @@ paths:
                                 $ref: '#/components/schemas/SuccessForgotPasswordResponse'
                 '204':
                     description: Reset Password Success
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/SuccessResetPasswordResponse'
                 '400':
                     description: The provided email does not registered yet or Password Reset Failure
                     content:
@@ -1531,11 +1526,6 @@ components:
             description: Send Reset Url To User's Email Success
             example: The Reset Url Was Send Successfully
 
-        ResetPasswordSuccessMessage:
-            type: string
-            description: Password Was Reset Successfully
-            example: The Password Was Reset Successfully
-
         EmailNotRegisterMessage:
             type: string
             description: If user provide wrong email which is not registered yet
@@ -1649,14 +1639,6 @@ components:
                 message:
                     $ref: '#/components/schemas/SendMailWithCodeMessage'
 
-        SuccessResetPasswordResponse:
-            type: object
-            properties:
-                code:
-                    $ref: '#/components/schemas/successCode'
-                message:
-                    $ref: '#/components/schemas/ResetPasswordSuccessMessage'
-
         BadForgotPasswordResponse:
             type: object
             properties:
@@ -1669,14 +1651,14 @@ components:
             type: object
             description: Must provide the token with the new password
             properties:
-                token:
+                resetToken:
                     type: string
                     description: The token was received from url which was sent to user's email
-                    example: ABCDEF
+                    example: "123132-Av0aase-ssalBd-serg@DHCJU9"
                 newPassword:
                     type: string
                     example: newPassword#999
-                repeatPassword:
+                confirmPassword:
                     type: string
                     example: newPassword#999
 
@@ -1686,7 +1668,7 @@ components:
                 newPassword:
                     type: string
                     example: newPassword#999
-                repeatPassword:
+                confirmPassword:
                     type: string
                     example: newPassword#999
 

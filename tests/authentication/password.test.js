@@ -111,10 +111,10 @@ describe('Update/Reset Password behaviors', () => {
 				API_PASSWORD_ENDPOINT + '?email=' + testUsers.user1.email,
 				{}, //body
 			);
-			expect(response.status).toBe(200);
-			expect(response.statusText).toBe('OK');
+			expect(response.status).toBe(202);
+			expect(response.statusText).toBe('Accepted');
 			expect(response.data.code).toBe(10001);
-			expect(response.data.message).toBe('Send Reset Url Success');	
+			expect(response.data.message).toBe('The Reset Url Was Send Successfully');	
 			
 			// getting the user id and reset code that was created in step request-forgot password above
 			const existingUser = await UserQuery.getUserByUserName(testUsers.user1.username);
@@ -129,10 +129,8 @@ describe('Update/Reset Password behaviors', () => {
 					confirmPassword: newPassword,
 				},
 			);
-			expect(response.status).toBe(200);
-			expect(response.statusText).toBe('OK');
-			expect(response.data.code).toBe(10001);
-			expect(response.data.message).toBe('Reset Password Success');	
+			expect(response.status).toBe(204);
+			expect(response.statusText).toBe('No Content');
 			
 			// check that after reset password, the reset code was deleted
 			const existingResetCode = await verifyCodeMysql.getResetCodeByUserId(existingUser.id, VERIFYCODE_TYPE.FORGOT_PASSWORD);
@@ -379,10 +377,8 @@ describe('Update/Reset Password behaviors', () => {
 					},
 				}
 			);
-			expect(response.status).toBe(200);
-			expect(response.statusText).toBe('OK');
-			expect(response.data.code).toBe(10001);
-			expect(response.data.message).toBe('Update Password Success');		
+			expect(response.status).toBe(204);
+			expect(response.statusText).toBe('No Content');
 			
 			// relogin with old password
 			response = await axiosAPIClient.post(

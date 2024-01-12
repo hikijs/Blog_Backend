@@ -4,7 +4,6 @@ const {
 	CREATED,
 	REDIRECT,
 } = require('../core/response/apiSuccessResponse');
-
 const AccessService = require('../services/access.services');
 class AccessController {
 	// eslint-disable-next-line no-unused-vars
@@ -91,10 +90,8 @@ class AccessController {
 
 	// eslint-disable-next-line no-unused-vars
 	updatePassword = async (req, res, next) => {
-		const message = await AccessService.updatePassword(req, res);
-		new OK({
-			message: message,
-		}).send(res);
+		const result = await AccessService.updatePassword(req, res);
+		new OK(result).send(res);
 	};
 
 	// eslint-disable-next-line no-unused-vars
