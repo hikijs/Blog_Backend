@@ -41,9 +41,10 @@ const AuthenticaseBasicSchema = {
 				})
 				.with('newPassword', 'confirmPassword')
 				.messages({
-					'any.required': 'Please provide newPassword and confirmPassword',
+					'any.required':
+						'Please provide newPassword and confirmPassword',
 					'any.only': 'confirm Password does not match',
-				})
+				}),
 		})
 			.xor('query', 'body')
 			.required()

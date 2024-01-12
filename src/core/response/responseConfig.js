@@ -4,6 +4,10 @@ const HttpStatus = {
 			statusCode: 200,
 			reason: 'Success',
 		},
+		ACCEPTED: {
+			statusCode: 202,
+			reason: 'Accepted',
+		},
 		CREATED: {
 			statusCode: 201,
 			reason: 'Created',

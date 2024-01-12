@@ -7,7 +7,6 @@ class UserController {
 	// eslint-disable-next-line no-unused-vars
 	getMyProfile = async (req, res, next) => {
 		var metaData = await UserService.getMyProfile(req);
-		delete metaData.password;
 		const msg = new OK({
 			message: 'Getting My Profile Success',
 			metaData: metaData,
@@ -18,7 +17,6 @@ class UserController {
 	// eslint-disable-next-line no-unused-vars
 	getUserInfo = async (req, res, next) => {
 		var metaData = await UserService.getUserInfo(req);
-		delete metaData.password;
 		const msg = new OK({
 			message: 'Getting User infor Success',
 			metaData: metaData,

@@ -13,12 +13,77 @@ const TransactionQuery = require('../dbs/transaction.mysql');
 const { NotifyManager } = require('./notification.services');
 const { getApi, putApi } = require('../helpers/callApi');
 const { createCookiesLogout } = require('../cookies/createCookies');
+const USER_INFO_TYPE = {
+	SELF: 'self',
+	FRIEND: 'friend',
+	OTHER: 'other',
+};
+
+class UserInfor {
+	constructor(userData) {
+		this.userData = userData;
+		this.setType(USER_INFO_TYPE.SELF);
+		delete this.userData.password;
+	}
+
+	setType(type) {
+		this.type = type;
+		this.userData['relationship'] = this.type;
+	}
+
+	getInfor() {
+		switch (this.type) {
+			case USER_INFO_TYPE.SELF:
+				return this.userData;
+			case USER_INFO_TYPE.FRIEND:
+				return this.sanlitizeForFriend();
+			case USER_INFO_TYPE.OTHER:
+				return this.sanlitizeForOther();
+			default:
+				throw new Error('The type of user info is not correct');
+		}
+	}
+
+	sanlitizeForFriend() {
+		let listKeys = [
+			'userId',
+			'userName',
+			'birthDay',
+			'bio',
+			'AvatarUrl',
+			'relationship',
+			'created_at',
+		];
+		let friendInfo = {};
+		for (let key of listKeys) {
+			friendInfo[key] = this.userData[key];
+		}
+		return friendInfo;
+	}
+
+	sanlitizeForOther() {
+		let listKeys = [
+			'userId',
+			'userName',
+			'bio',
+			'AvatarUrl',
+			'relationship',
+			'created_at',
+		];
+		let otherInfo = {};
+		for (let key of listKeys) {
+			otherInfo[key] = this.userData[key];
+		}
+		return otherInfo;
+	}
+}
 class UserService {
 	static getMyProfile = async (req) => {
 		const userId = req.cookies.userId;
 		try {
 			const userData = await UserQuery.getUserById(userId);
-			return userData;
+			const userInfor = new UserInfor(userData);
+			return userInfor.getInfor();
 		} catch (error) {
 			throw new Error('Issue Happen When Get User Profile');
 		}
@@ -35,11 +100,21 @@ class UserService {
 		try {
 			const userExists = await UserQuery.checkUserExistById(userId);
 			if (userExists) {
-				const userData = await UserQuery.getUserById(
-					userId,
-					currentUserId == userId
-				);
-				return userData;
+				const userData = await UserQuery.getUserById(userId);
+				const userInfor = new UserInfor(userData);
+				if (userData.userId != currentUserId) {
+					// check if they are friend or not
+					const friendShip = await FriendQuery.checkIfTheyAreFriend(
+						currentUserId,
+						userId
+					);
+					if (friendShip) {
+						userInfor.setType(USER_INFO_TYPE.FRIEND);
+					} else {
+						userInfor.setType(USER_INFO_TYPE.OTHER);
+					}
+				}
+				return userInfor.getInfor();
 			} else {
 				throw new BadRequestError({
 					message: 'User does not exist',

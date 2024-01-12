@@ -37,6 +37,7 @@ const {
 	createCookiesAuthen,
 	createCookiesLogout,
 } = require('../cookies/createCookies');
+const { HttpStatus } = require('../core/response/responseConfig');
 
 const changePassword = async (
 	newPassword,
@@ -604,8 +605,9 @@ class AccessService {
 					});
 				}
 				await changePassword(newPassword, confirmPassword, userId);
-				message = 'Update Password Success';
-				return message;
+				return {
+					customStatus: HttpStatus._2xx.NO_CONTEND,
+				};
 			} else {
 				const { email } = req.query;
 				if (email) {
@@ -630,8 +632,10 @@ class AccessService {
 						'@' +
 						resetCode;
 					await mailTransport.send(email, 'reset link', resetUrl);
-					message = 'Send Reset Url Success';
-					return message;
+					return {
+						message: 'The Reset Url Was Send Successfully',
+						customStatus: HttpStatus._2xx.ACCEPTED,
+					};
 				} // handling for case reset password
 				else {
 					const { resetToken, newPassword, confirmPassword } =
@@ -649,8 +653,9 @@ class AccessService {
 						userId,
 						resetCode
 					);
-					message = 'Reset Password Success';
-					return message;
+					return {
+						customStatus: HttpStatus._2xx.NO_CONTEND,
+					};
 				}
 			}
 		} catch (error) {
