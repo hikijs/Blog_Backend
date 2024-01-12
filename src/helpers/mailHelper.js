@@ -19,14 +19,19 @@ class mailTransport {
 		mailOptions.to = desMail;
 		mailOptions.subject = subject;
 		mailOptions.text = text;
-
-		this.transporter.sendMail(mailOptions, function (error, info) {
-			if (error) {
-				console.log(error);
-			} else {
-				console.log('Email sent: ' + info.response);
-			}
-		});
+		// because sendMail is a callback function, so we need to wrap it in a promise
+		const sendMail = new Promise(function (resolve, reject) {
+			this.transporter.sendMail(mailOptions, function (error, info) {
+				if (error) {
+					console.log(error);
+					reject(error);
+				} else {
+					console.log('Email sent: ' + info.response);
+					resolve();
+				}
+			});
+		}.bind(this));
+		await sendMail;
 	}
 }
 

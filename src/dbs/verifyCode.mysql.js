@@ -5,6 +5,29 @@ class VerifyCodeQuery extends QueryBase {
 	constructor() {
 		super();
 	}
+
+	async getResetCodeByUserId(userId, typeCode) {
+		try {
+			const query = 'SELECT * FROM VERIFYCODE WHERE userId = ? AND typeCode = ?';
+			const results = await this.dbInstance.hitQuery(query, [userId, typeCode]);
+			if(results.length > 1)
+			{
+				throw new Error('More than one code for user');
+			}
+			else if(results.length == 1)
+			{
+				return results[0];
+			}
+			else
+			{
+				return null;
+			}
+		} catch (error) {
+			console.log(error);
+			return null;
+		}
+	}
+
 	async checkCodeForUserExist(userId) {
 		try {
 			const query = 'SELECT * FROM VERIFYCODE WHERE userId = ? ';
@@ -76,7 +99,6 @@ class VerifyCodeQuery extends QueryBase {
 					verifyCodeSql,
 					[userId]
 				);
-				console.log(verifyCode);
 				return verifyCode;
 			} catch (error) {
 				throw new Error('Can not process update password');
