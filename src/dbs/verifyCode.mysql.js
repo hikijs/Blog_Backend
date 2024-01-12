@@ -8,18 +8,17 @@ class VerifyCodeQuery extends QueryBase {
 
 	async getResetCodeByUserId(userId, typeCode) {
 		try {
-			const query = 'SELECT * FROM VERIFYCODE WHERE userId = ? AND typeCode = ?';
-			const results = await this.dbInstance.hitQuery(query, [userId, typeCode]);
-			if(results.length > 1)
-			{
+			const query =
+				'SELECT * FROM VERIFYCODE WHERE userId = ? AND typeCode = ?';
+			const results = await this.dbInstance.hitQuery(query, [
+				userId,
+				typeCode,
+			]);
+			if (results.length > 1) {
 				throw new Error('More than one code for user');
-			}
-			else if(results.length == 1)
-			{
+			} else if (results.length == 1) {
 				return results[0];
-			}
-			else
-			{
+			} else {
 				return null;
 			}
 		} catch (error) {

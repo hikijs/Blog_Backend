@@ -608,7 +608,6 @@ class AccessService {
 				return {
 					customStatus: HttpStatus._2xx.NO_CONTEND,
 				};
-				
 			} else {
 				const { email } = req.query;
 				if (email) {

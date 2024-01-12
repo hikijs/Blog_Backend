@@ -1654,7 +1654,7 @@ components:
                 resetToken:
                     type: string
                     description: The token was received from url which was sent to user's email
-                    example: "123132-Av0aase-ssalBd-serg@DHCJU9"
+                    example: '123132-Av0aase-ssalBd-serg@DHCJU9'
                 newPassword:
                     type: string
                     example: newPassword#999

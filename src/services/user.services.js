@@ -19,24 +19,20 @@ const USER_INFO_TYPE = {
 	OTHER: 'other',
 };
 
-class UserInfor{
-	constructor(userData)
-	{
+class UserInfor {
+	constructor(userData) {
 		this.userData = userData;
 		this.setType(USER_INFO_TYPE.SELF);
 		delete this.userData.password;
 	}
 
-	setType(type)
-	{
+	setType(type) {
 		this.type = type;
 		this.userData['relationship'] = this.type;
 	}
 
-	getInfor()
-	{
-		switch(this.type)
-		{
+	getInfor() {
+		switch (this.type) {
 			case USER_INFO_TYPE.SELF:
 				return this.userData;
 			case USER_INFO_TYPE.FRIEND:
@@ -48,23 +44,34 @@ class UserInfor{
 		}
 	}
 
-	sanlitizeForFriend()
-	{
-		let listKeys = ['userId','userName', 'birthDay', 'bio', 'AvatarUrl', 'relationship', 'created_at'];
+	sanlitizeForFriend() {
+		let listKeys = [
+			'userId',
+			'userName',
+			'birthDay',
+			'bio',
+			'AvatarUrl',
+			'relationship',
+			'created_at',
+		];
 		let friendInfo = {};
-		for(let key of listKeys)
-		{
+		for (let key of listKeys) {
 			friendInfo[key] = this.userData[key];
 		}
 		return friendInfo;
 	}
 
-	sanlitizeForOther()
-	{
-		let listKeys = ['userId','userName', 'bio', 'AvatarUrl', 'relationship', 'created_at'];
+	sanlitizeForOther() {
+		let listKeys = [
+			'userId',
+			'userName',
+			'bio',
+			'AvatarUrl',
+			'relationship',
+			'created_at',
+		];
 		let otherInfo = {};
-		for(let key of listKeys)
-		{
+		for (let key of listKeys) {
 			otherInfo[key] = this.userData[key];
 		}
 		return otherInfo;
@@ -95,19 +102,15 @@ class UserService {
 			if (userExists) {
 				const userData = await UserQuery.getUserById(userId);
 				const userInfor = new UserInfor(userData);
-				if(userData.userId != currentUserId)
-				{
+				if (userData.userId != currentUserId) {
 					// check if they are friend or not
 					const friendShip = await FriendQuery.checkIfTheyAreFriend(
 						currentUserId,
 						userId
 					);
-					if(friendShip)
-					{
+					if (friendShip) {
 						userInfor.setType(USER_INFO_TYPE.FRIEND);
-					}
-					else
-					{
+					} else {
 						userInfor.setType(USER_INFO_TYPE.OTHER);
 					}
 				}
