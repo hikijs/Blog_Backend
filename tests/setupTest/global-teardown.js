@@ -3,6 +3,7 @@ const dockerCompose = require('docker-compose');
 const path = require('path');
 // const { execSync } = require('child_process');
 async function tearDownAllContainers() {
+	// eslint-disable-next-line no-undef
 	const currentDir = __dirname;
 	return dockerCompose.down({
 		cwd: path.join(currentDir),
@@ -12,7 +13,8 @@ async function tearDownAllContainers() {
 
 module.exports = async () => {
 	console.log('===>  TEAR DOWN TEST ENVIRONMENT <===');
-	if (isCI) { // when using github action, jenkins, circleci, ...
+	if (isCI) {
+		// when using github action, jenkins, circleci, ...
 		await tearDownAllContainers();
 	} else {
 		await tearDownAllContainers();

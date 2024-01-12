@@ -6,8 +6,11 @@ const UserQuery = require('../../src/dbs/user.mysql');
 const { CONFIGS } = require('../config/config');
 
 // regulare express for public key is heximal string with length is 128
+// eslint-disable-next-line no-unused-vars
 const PUBLICKEY_REGEX = /^[0-9a-fA-F]{128}$/;
+
 // Use a regular expression to check if valid JWT token
+// eslint-disable-next-line no-unused-vars
 const JWT_REGEX = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
 let axiosAPIClient;
 beforeAll(async () => {

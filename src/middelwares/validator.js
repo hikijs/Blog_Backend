@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 const { BadRequestError } = require('../core/error.response');
 
 const ValidationSource = {
@@ -6,25 +7,48 @@ const ValidationSource = {
 	QUERY: 'query',
 	PARAM: 'params',
 	COOKIES: 'cookies',
+	FLEX: 'flex',
 };
 
 const Validator = (template) => {
 	return (req, res, next) => {
 		try {
 			let options = {};
-			const { source, schema } = template;
+			const { schema } = template;
+			let source = template.source;
+			if (typeof source !== 'string') {
+				source = ValidationSource.FLEX;
+			}
+
 			if (source == ValidationSource.HEADER) {
 				options = { allowUnknown: true };
 			}
-			const { error } = schema.validate(req[source], options);
 
-			if (!error) return next(); // pass Validator
+			// eslint-disable-next-line no-inner-declarations
+			function sourceFex(req, sources) {
+				let result = {};
+				for (let source of sources) {
+					if (!(Object.keys(req[source]).length == 0)) {
+						result[source] = req[source];
+					}
+				}
+				console.log(result);
+				return result;
+			}
 
+			const { error } = schema.validate(
+				source != ValidationSource.FLEX
+					? req[source]
+					: sourceFex(req, template.source),
+				options
+			);
+			// pass validator if there is no error
+			if (!error) return next();
 			const { details } = error;
 			const message = details
 				.map((i) => i.message.replace(/['"]+/g, ''))
 				.join(',');
-			console.log(error);
+			// console.log(error);
 			// Go to Error Hanlding Logic
 			next(
 				new BadRequestError({

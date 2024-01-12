@@ -90,29 +90,10 @@ class AccessController {
 	};
 
 	// eslint-disable-next-line no-unused-vars
-	forgotPassword = async (req, res, next) => {
-		const { metaData } = await AccessService.forgotPassword(req, res);
+	updatePassword = async (req, res, next) => {
+		const message = await AccessService.updatePassword(req, res);
 		new OK({
-			message: 'The Reset Url Was Send Successfully',
-			metaData: metaData,
-		}).send(res);
-	};
-
-	// eslint-disable-next-line no-unused-vars
-	forgotPasswordVerify = async (req, res, next) => {
-		const { metaData } = await AccessService.forgotPasswordVerify(req, res);
-		new OK({
-			message: 'You Can Change New Password',
-			metaData: metaData,
-		}).send(res);
-	};
-
-	// eslint-disable-next-line no-unused-vars
-	resetPassword = async (req, res, next) => {
-		const { metaData } = await AccessService.resetPassword(req, res);
-		new OK({
-			message: 'updated new password',
-			metaData: metaData,
+			message: message,
 		}).send(res);
 	};
 

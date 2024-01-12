@@ -21,6 +21,36 @@ const AuthenticaseBasicSchema = {
 			password: Joi.string().required().min(4),
 		}),
 	},
+
+	PASSWORD: {
+		source: [ValidationSource.QUERY, ValidationSource.BODY],
+		schema: Joi.object({
+			query: Joi.object().keys({
+				email: Joi.string().required().email().messages({
+					'string.email': 'Please enter a valid email address',
+				}),
+			}),
+			body: Joi.object()
+				.keys({
+					resetToken: Joi.string().optional(),
+					newPassword: Joi.string().required().min(4),
+					confirmPassword: Joi.string()
+						.valid(Joi.ref('newPassword'))
+						.required()
+						.min(4),
+				})
+				.with('newPassword', 'confirmPassword'),
+		})
+			.xor('query', 'body')
+			.required()
+			.messages({
+				'object.xor': 'Please provide either query or body',
+			})
+			.messages({
+				'object.missing':
+					'Please provide either query for unauthenticated user or body for authenticated user',
+			}),
+	},
 };
 
 module.exports = AuthenticaseBasicSchema;
