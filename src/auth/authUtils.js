@@ -4,20 +4,40 @@ const { BadRequestError, AuthFailureError } = require('../core/error.response');
 const VerifyCodeQuery = require('../dbs/verifyCode.mysql');
 const { VERIFYCODE_TYPE } = require('../configs/configurations');
 const KeyStoreQuery = require('../dbs/keystore.mysql');
-// FIX me because currently in the source code, the keys are not key pair
+const crypto = require('crypto');
+
+const createAsymmetricKeyPair = () => {
+	// create key pair publickey and privatekey
+	const {privateKey, publicKey} = crypto.generateKeyPairSync('rsa', {
+		modulusLength: 4096,
+		publicKeyEncoding: {
+			type: 'pkcs1',
+			format: 'pem'
+		},
+		privateKeyEncoding: {
+			type: 'pkcs1',
+			format: 'pem'
+		}
+	});
+
+	return {privateKey, publicKey};
+};
+
 // so that we only use private key
 const createTokenPair = async (payload, publicKey, privateKey) => {
 	try {
 		// create access token by private key
-		const accessToken = await JWT.sign(payload, privateKey, {
+		const accessToken = JWT.sign(payload, privateKey, {
 			expiresIn: '2 days',
+			algorithm: 'RS256'
 		});
 		// refresh access token by private key
-		const refreshToken = await JWT.sign(payload, privateKey, {
+		const refreshToken = JWT.sign(payload, privateKey, {
 			expiresIn: '7 days',
+			algorithm: 'RS256'
 		});
 
-		JWT.verify(accessToken, privateKey, (err, decode) => {
+		JWT.verify(accessToken, publicKey, (err, decode) => {
 			if (err) {
 				console.error('error verify: ', err);
 			} else {
@@ -49,7 +69,7 @@ const isAuthenticatedUser = async (req) => {
 		if (keyStore == null) {
 			throw new Error('Can not find keyStore');
 		}
-		const decodeUser = JWT.verify(accessToken, keyStore.privateKey);
+		const decodeUser = JWT.verify(accessToken, keyStore.publicKey);
 		if (userId !== decodeUser.userId) {
 			throw new Error('Not Authenticate User');
 		}
@@ -105,6 +125,7 @@ const verifyResetPassword = asyncHanlder(async (req, res, next) => {
 });
 
 module.exports = {
+	createAsymmetricKeyPair,
 	createTokenPair,
 	authentication,
 	verifyResetPassword,

@@ -6,7 +6,7 @@ const {
 const KeyStoreQuery = require('../dbs/keystore.mysql');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const { createTokenPair, isAuthenticatedUser } = require('../auth/authUtils');
+const { createAsymmetricKeyPair, createTokenPair, isAuthenticatedUser } = require('../auth/authUtils');
 const { BadRequestError, AuthFailureError } = require('../core/error.response');
 const VerifyCodeQuery = require('../dbs/verifyCode.mysql');
 const { generateVerificationCode } = require('../helpers/randomCode');
@@ -119,10 +119,8 @@ class AccessService {
 				passwordHashed,
 				birth
 			);
-			// the publicKey and private key will has a length 128 in string format
-			// because 1 bytes was represent by 2 heximal => 64 bytes => 128 hex charactes
-			const publicKey = crypto.randomBytes(64).toString('hex');
-			const privateKey = crypto.randomBytes(64).toString('hex');
+
+			const {publicKey, privateKey} = createAsymmetricKeyPair();
 			const tokens = await createTokenPair(
 				{ userId: newUser, email: email },
 				publicKey,
@@ -141,6 +139,7 @@ class AccessService {
 				newUserId: newUser,
 			};
 		} catch (error) {
+			console.log(error);
 			await TransactionQuery.rollBackTransaction();
 			throw new BadRequestError({
 				message: 'Error: Issue when create new user and keystore',
@@ -181,10 +180,8 @@ class AccessService {
 			});
 		}
 
-		const publicKey = crypto.randomBytes(64).toString('hex');
-		const privateKey = crypto.randomBytes(64).toString('hex');
+		const {publicKey, privateKey} = createAsymmetricKeyPair();
 		const instanceId = userInstance.userId;
-		console.log(`update date key store for user ${instanceId}`);
 		const tokens = await createTokenPair(
 			{ userId: instanceId, email: email },
 			publicKey,
@@ -271,8 +268,7 @@ class AccessService {
 				await UserQuery.updateVerifiedStatus(verified_email, userId);
 				// update avatar for user
 				await ImageData.insertImageToDb(picture, 'avatar', userId);
-				const publicKey = crypto.randomBytes(64).toString('hex');
-				const privateKey = crypto.randomBytes(64).toString('hex');
+				const {publicKey, privateKey} = createAsymmetricKeyPair();
 				const tokens = await createTokenPair(
 					{ userId: userId, email: email },
 					publicKey,
@@ -420,8 +416,7 @@ class AccessService {
 					null,
 					access_token
 				);
-				const publicKey = crypto.randomBytes(64).toString('hex');
-				const privateKey = crypto.randomBytes(64).toString('hex');
+				const {publicKey, privateKey} = createAsymmetricKeyPair();
 				const tokens = await createTokenPair(
 					{ userId: userId, email: email },
 					publicKey,
@@ -543,8 +538,7 @@ class AccessService {
 				await ImageData.insertImageToDb(avatar_url, 'avatar', userId);
 				await UserQuery.updateVerifiedStatus(verified, userId);
 
-				const publicKey = crypto.randomBytes(64).toString('hex');
-				const privateKey = crypto.randomBytes(64).toString('hex');
+				const {publicKey, privateKey} = createAsymmetricKeyPair();				
 				const tokens = await createTokenPair(
 					{ userId: userId, email: email },
 					publicKey,
