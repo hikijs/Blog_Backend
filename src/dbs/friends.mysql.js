@@ -48,7 +48,7 @@ class FriendQuery extends QueryBase {
 		}
 	}
 
-	async getAllFriendRequestsByStatus(recipientId, status = null) {
+	async getIncommingFriendRequestByStatus(recipientId, status = null) {
 		let query = `SELECT FR.requesterId,
                             U1.userName AS requesterName,
                             FR.recipientId, 
@@ -65,14 +65,43 @@ class FriendQuery extends QueryBase {
 			listParams.push(status);
 		}
 		try {
-			const listFriendRequest = await this.dbInstance.hitQuery(
+			const listIncomingFriendRequest = await this.dbInstance.hitQuery(
 				query,
 				listParams
 			);
-			return listFriendRequest;
+			return listIncomingFriendRequest;
 		} catch (error) {
 			throw new BadRequestError({
-				message: 'Some thing went wrong when making friend request',
+				message: 'Getting Incomming Friend Request Failed',
+			});
+		}
+	}
+
+	async getOutgoingFriendRequestByStatus(requesterId, status = null) {
+		let query = `SELECT FR.requesterId,
+                            U1.userName AS requesterName,
+                            FR.recipientId, 
+                            U2.userName AS recipientName,
+                            FR.status,
+                            FR.created_at
+                    FROM FRIEND_REQUESTS FR
+                    LEFT JOIN USER U1 ON U1.userId = FR.requesterId
+                    LEFT JOIN USER U2 ON U2.userId = FR.recipientId
+                    WHERE FR.requesterId = ? `;
+		let listParams = [requesterId];
+		if (status) {
+			query = query + ' AND FR.status = ?';
+			listParams.push(status);
+		}
+		try {
+			const listOutgoingFriendRequest = await this.dbInstance.hitQuery(
+				query,
+				listParams
+			);
+			return listOutgoingFriendRequest;
+		} catch (error) {
+			throw new BadRequestError({
+				message: 'Getting Outgoing Friend Request Failed',
 			});
 		}
 	}
