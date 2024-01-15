@@ -178,9 +178,9 @@ class UserService {
 				VERIFYCODE_TYPE.VERIFY_EMAIL,
 				userData.userId
 			);
-			await mailTransport.send(userData.email, 'reset code', code);
+			await mailTransport.send(userData.email, 'Verification Email Code', code);
 			const metaData = {
-				link: `http://localhost:3000/v1/api/user/auth/verify/${code}`,
+				link: `http://localhost:3000/v1/api/user/auth/verification-email/${code}`,
 			};
 			return metaData;
 		} catch (error) {
@@ -190,9 +190,9 @@ class UserService {
 		}
 	};
 
-	static updateStatusVerifyForUser = async (req) => {
+	static executeVerifyEmailForUser = async (req) => {
 		const userId = req.cookies.userId;
-		const verifyCode = req.params.verifyCode;
+		const verifyCode = req.body.verifyCode;
 		if (!verifyCode || !userId) {
 			throw new BadRequestError({
 				message: 'Please give more information',

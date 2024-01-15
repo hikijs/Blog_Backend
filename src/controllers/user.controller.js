@@ -18,7 +18,7 @@ class UserController {
 	getUserInfo = async (req, res, next) => {
 		var metaData = await UserService.getUserInfo(req);
 		const msg = new OK({
-			message: 'Getting User infor Success',
+			message: 'Getting User Infor Success',
 			metaData: metaData,
 		});
 		msg.send(res);
@@ -49,17 +49,17 @@ class UserController {
 	verifyEmailForUser = async (req, res, next) => {
 		var metaData = await UserService.verifyEmailForUser(req);
 		const msg = new OK({
-			message: 'Email has sent ',
+			message: 'Request Verification Email Success',
 			metaData: metaData,
 		});
 		msg.send(res);
 	};
 
 	// eslint-disable-next-line no-unused-vars
-	updateStatusVerifyForUser = async (req, res, next) => {
-		var metaData = await UserService.updateStatusVerifyForUser(req);
+	executeVerifyEmailForUser = async (req, res, next) => {
+		var metaData = await UserService.executeVerifyEmailForUser(req);
 		const msg = new OK({
-			message: 'Status Verified of user has updated ',
+			message: 'User Email Verified Success',
 			metaData: metaData,
 		});
 		msg.send(res);

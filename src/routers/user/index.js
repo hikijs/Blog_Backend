@@ -12,10 +12,10 @@ router.use(authentication);
 // get my profile
 router.get('/my-profile', asyncHanlder(UserController.getMyProfile));
 
-router.post('/verify', asyncHanlder(UserController.verifyEmailForUser));
+router.post('/request-email-verification', asyncHanlder(UserController.verifyEmailForUser));
 router.post(
-	'/verify/:verifyCode',
-	asyncHanlder(UserController.updateStatusVerifyForUser)
+	'/verification-email',
+	asyncHanlder(UserController.executeVerifyEmailForUser)
 );
 
 // friend request

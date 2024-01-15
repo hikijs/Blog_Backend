@@ -159,7 +159,7 @@ paths:
         get:
             tags:
                 - User
-            summary: Get Other User Infor
+            summary: Get User Infor
             description: Get Other User Infor base on the relationship between them
             parameters:
                 - in: path
@@ -171,11 +171,11 @@ paths:
             operationId: userGET
             responses:
                 '200':
-                    description: Getting User infor Success
+                    description: Getting User Infor Success
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/SuccessGetUserInforResponse'
+                              $ref: '#/components/schemas/SuccessGetUserInforResponse'
                 '401':
                     description: Authenticate Failure
                     content:
@@ -261,7 +261,7 @@ paths:
                                     message:
                                         type: string
                                         example: Issue Happen When Update Your Account
-    /user/request-verify-email:
+    /user/request-email-verification:
         post:
             tags:
                 - User
@@ -270,7 +270,7 @@ paths:
             operationId: requestVerifyPOST
             responses:
                 '200':
-                    description: Request Verified Success
+                    description: Request Verification Email Success
                     content:
                         application/json:
                             schema:
@@ -294,27 +294,27 @@ paths:
                                         type: string
                                         example: Issue Happen When Request Verify Account
 
-    /user/verify-email:
+    /user/verification-email:
         post:
             tags:
                 - User
             summary: request verify the email
-            description: The server will send the token to the user's email that was registered
+            description: The server will send the code to the user's email that was registered
             operationId: verifyEmailPOST
             requestBody:
-                description: Provided the token was sent to user's email when request verify
+                description: Provided the code was sent to user's email when request verify
                 required: false
                 content:
                     application/json:
                         schema:
                             type: object
                             properties:
-                                verifyToken:
+                                verifyCode:
                                     type: string
                                     example: ABCDEF
             responses:
                 '200':
-                    description: Request Verified Successfully
+                    description: User Email Verified Success
                     content:
                         application/json:
                             schema:
@@ -1533,8 +1533,8 @@ components:
 
         GetOtherInforSuccessMessage:
             type: string
-            description: Getting User infor Success
-            example: Getting User infor Success
+            description: Getting User Infor Success
+            example: Getting User Infor Success
 
         GetFriendsSuccessMessage:
             type: string
@@ -1696,7 +1696,7 @@ components:
             format: date
             description: the latest date, account was updated
         # User
-        userInfor:
+        fullUserInfor:
             type: object
             properties:
                 userId:
@@ -1715,10 +1715,49 @@ components:
                     $ref: '#/components/schemas/oauth_provider'
                 AvatarUrl:
                     $ref: '#/components/schemas/AvatarUrl'
+                relationship:
+                    type: string
+                    example: self
                 created_at:
                     $ref: '#/components/schemas/created_at'
                 updated_at:
                     $ref: '#/components/schemas/updated_at'
+        # Friend Infor:
+        friendInfor:
+            type: object
+            properties:
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                bio:
+                    $ref: '#/components/schemas/bio'
+                birthDay:
+                    $ref: '#/components/schemas/birth'
+                AvatarUrl:
+                    $ref: '#/components/schemas/AvatarUrl'
+                created_at:
+                    $ref: '#/components/schemas/created_at'
+                relationship:
+                    type: string
+                    example: friend
+        # Friend Infor:
+        otherInfor:
+            type: object
+            properties:
+                userId:
+                    $ref: '#/components/schemas/userId'
+                userName:
+                    $ref: '#/components/schemas/username'
+                bio:
+                    $ref: '#/components/schemas/bio'
+                AvatarUrl:
+                    $ref: '#/components/schemas/AvatarUrl'
+                created_at:
+                    $ref: '#/components/schemas/created_at'
+                relationship:
+                    type: string
+                    example: other
         # Friend
         friendInfo:
             type: object
@@ -1841,7 +1880,10 @@ components:
                 message:
                     $ref: '#/components/schemas/GetOtherInforSuccessMessage'
                 metaData:
-                    $ref: '#/components/schemas/userInfor'
+                    anyOf:
+                    - $ref: '#/components/schemas/fullUserInfor'
+                    - $ref: '#/components/schemas/friendInfor'
+                    - $ref: '#/components/schemas/otherInfor'
 
         SuccessUpdateUserInforResponse:
             type: object
@@ -1851,7 +1893,7 @@ components:
                 message:
                     $ref: '#/components/schemas/GetOtherInforSuccessMessage'
                 metaData:
-                    $ref: '#/components/schemas/userInfor'
+                    $ref: '#/components/schemas/fullUserInfor'
 
         SuccessRequestVerifyResponse:
             type: object
@@ -1860,7 +1902,7 @@ components:
                     $ref: '#/components/schemas/successCode'
                 message:
                     type: string
-                    example: The Verify Code Was Sent Successfully
+                    example: User Email Verified Success
 
         SuccessFriendRequestResponse:
             type: object
