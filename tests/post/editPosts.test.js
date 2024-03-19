@@ -214,7 +214,8 @@ describe('APIs Create Post', () => {
 						code: 10004,
 						message: 'Please Provide The Change',
 					});
-				} else if (subFields.includes('categrories')) {
+				}
+				else if (subFields.includes('categrories')) {
 					let subCategrories = [];
 					if (typeof FieldEditPosts.categrories == 'function') {
 						subCategrories = FieldEditPosts.categrories();
@@ -299,7 +300,8 @@ describe('APIs Create Post', () => {
 							);
 						}
 					}
-				} else {
+				}
+				else {
 					for (const field of subFields) {
 						const postEdit = {};
 						postEdit[field] =
