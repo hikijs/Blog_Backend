@@ -7,10 +7,7 @@ const mailTransport = require('../helpers/mailHelper');
 const {
 	TIMEOUT,
 	VERIFYCODE_TYPE,
-	NOTIFICATION_CONFIG,
 } = require('../configs/configurations');
-const TransactionQuery = require('../dbs/transaction.mysql');
-const { NotifyManager } = require('./notification.services');
 const { getApi, putApi } = require('../helpers/callApi');
 const { createCookiesLogout } = require('../cookies/createCookies');
 const USER_INFO_TYPE = {
@@ -178,9 +175,9 @@ class UserService {
 				VERIFYCODE_TYPE.VERIFY_EMAIL,
 				userData.userId
 			);
-			await mailTransport.send(userData.email, 'reset code', code);
+			await mailTransport.send(userData.email, 'Verification Email Code', code);
 			const metaData = {
-				link: `http://localhost:3000/v1/api/user/auth/verify/${code}`,
+				link: `http://localhost:3000/v1/api/user/auth/verification-email/${code}`,
 			};
 			return metaData;
 		} catch (error) {
@@ -190,9 +187,9 @@ class UserService {
 		}
 	};
 
-	static updateStatusVerifyForUser = async (req) => {
+	static executeVerifyEmailForUser = async (req) => {
 		const userId = req.cookies.userId;
-		const verifyCode = req.params.verifyCode;
+		const verifyCode = req.body.verifyCode;
 		if (!verifyCode || !userId) {
 			throw new BadRequestError({
 				message: 'Please give more information',
@@ -223,239 +220,6 @@ class UserService {
 		}
 
 		return {};
-	};
-
-	static getFriendRequest = async (req) => {
-		const recipientId = req.cookies.userId;
-		const status = req.query.status;
-		if (!recipientId) {
-			throw new BadRequestError({
-				message: 'Please give more information',
-			});
-		}
-		if (
-			status &&
-			status != 'Accepted' &&
-			status != 'Rejected' &&
-			status != 'Pending'
-		) {
-			throw new BadRequestError({
-				message:
-					'The status does not expectation, should be \
-							  (Accepted ,Rejected or Pending)',
-			});
-		}
-
-		try {
-			const listRequests = await FriendQuery.getAllFriendRequestsByStatus(
-				recipientId,
-				status
-			);
-			return { listRequests: listRequests };
-		} catch (error) {
-			throw new BadRequestError({
-				message: 'Something went wrong when getting data',
-			});
-		}
-	};
-
-	static friendRequest = async (req) => {
-		const requesterId = req.cookies.userId;
-		const recipientId = req.params.friendId;
-
-		if (!requesterId || !recipientId) {
-			throw new BadRequestError({
-				message: 'Please give more information',
-			});
-		}
-		if (requesterId === recipientId) {
-			throw new BadRequestError({
-				message: 'Please double check your input',
-			});
-		}
-		await TransactionQuery.startTransaction();
-		try {
-			// because this is the request friend so that status is Pending
-			const status = 'Pending';
-			await FriendQuery.upsertNewFriendRequest(
-				requesterId,
-				recipientId,
-				status
-			);
-			// trigger sending notify for friend request event
-			NotifyManager.triggerNotify(
-				NOTIFICATION_CONFIG?.TYPES?.friendRequest,
-				requesterId,
-				recipientId
-			);
-			await TransactionQuery.commitTransaction();
-		} catch (error) {
-			await TransactionQuery.rollBackTransaction();
-			throw new BadRequestError({
-				message: error,
-			});
-		}
-		return {};
-	};
-
-	static unfriend = async (req) => {
-		const requesterId = req.cookies.userId;
-		const recipientId = req.params.friendId;
-		if (requesterId === recipientId) {
-			throw new BadRequestError({
-				message: 'Please double check your input',
-			});
-		}
-		if (!requesterId || !recipientId) {
-			throw new BadRequestError({
-				message: 'Please give more information',
-			});
-		}
-		await TransactionQuery.startTransaction();
-		try {
-			await FriendQuery.deleteFriendShip(requesterId, recipientId);
-			await TransactionQuery.commitTransaction();
-		} catch (error) {
-			await TransactionQuery.rollBackTransaction();
-			throw new BadRequestError({
-				message: error,
-			});
-		}
-		return {};
-	};
-
-	static answereRequest = async (req) => {
-		const recipientId = req.cookies.userId;
-		const requesterId = req.params.requesterId;
-		const status = req.query.ans;
-		if (requesterId === recipientId) {
-			throw new BadRequestError({
-				message: 'Please double check your input',
-			});
-		}
-		const friendlyExistence = await FriendQuery.checkIfTheyAreFriend(
-			requesterId,
-			recipientId
-		);
-		if (friendlyExistence) {
-			throw new BadRequestError({
-				message: 'You and this user is the friend right now',
-			});
-		}
-		if (!requesterId || !recipientId || !status) {
-			throw new BadRequestError({
-				message: 'Please give more information',
-			});
-		}
-		// should be answered for pending request, that mean each request only was answered one time
-		const friendRequestExist = await FriendQuery.isFriendRequestExist(
-			requesterId,
-			recipientId,
-			'Pending'
-		);
-		if (!friendRequestExist) {
-			throw new BadRequestError({
-				message:
-					'No friend request with status is pending exist, \
-							 maybe you have answered before',
-			});
-		}
-		// update friend request and frienship
-		await TransactionQuery.startTransaction();
-		try {
-			await FriendQuery.updateFriendRequest(
-				requesterId,
-				recipientId,
-				status
-			);
-			const currentStatus = await FriendQuery.getStatusOfFriendRequest(
-				requesterId,
-				recipientId
-			);
-			if (currentStatus == 'Accepted') {
-				await FriendQuery.addNewFriendShip(recipientId, requesterId);
-				// trigger sending notify for answere request event
-				// this change the position of recipient and requester for mapping the notify
-				NotifyManager.triggerNotify(
-					NOTIFICATION_CONFIG?.TYPES?.acceptedRequest,
-					recipientId,
-					requesterId
-				);
-			}
-			await TransactionQuery.commitTransaction();
-		} catch (error) {
-			await TransactionQuery.rollBackTransaction();
-			throw new BadRequestError({
-				message: error,
-			});
-		}
-		return {};
-	};
-
-	static getMyFriends = async (req) => {
-		const userId = req.cookies.userId;
-		if (!userId) {
-			throw new BadRequestError({
-				message: 'Please give more information',
-			});
-		}
-		try {
-			const listFriends = await FriendQuery.getFriendOfUser(userId);
-			return { listFriends: listFriends };
-		} catch (error) {
-			throw new BadRequestError({
-				message: error,
-			});
-		}
-	};
-
-	static getRecommendFollowings = async (req) => {
-		const userId = req.cookies.userId;
-		const limit = req.query.limit || 3;
-		let page = Number(req.query.page) || 1;
-		if (!userId) {
-			throw new BadRequestError({
-				message: 'Please give more information',
-			});
-		}
-		try {
-			const totalRecommend = await FriendQuery.getTotalNotFriend(userId);
-			const maxPage = Math.ceil(totalRecommend / limit);
-			console.log(maxPage);
-			let nextPage = 0;
-			if (page > maxPage || maxPage == 0) {
-				page = 1;
-				nextPage = maxPage == 0 ? 1 : page + 1;
-			} else {
-				nextPage = page + 1;
-			}
-			const offset = (page - 1) * limit;
-			const listNotFriendWithUser =
-				await FriendQuery.getListNotFriendWithUser(
-					userId,
-					limit,
-					offset
-				);
-			// if go to next page, the next page is 1, looping
-			const linkNextPage = `http://${req.host}:3000/v1/api/user/recommendFollowing?limit=${limit}&page=${nextPage}`;
-			// FIXME the prev link does not used now, so maybe some issue there
-			const linkPreviousPage = `http://${
-				req.host
-			}:3000/v1/api/user/recommendFollowing?limit=${limit}&page=${
-				page - 1
-			}`;
-			return {
-				totalPage: maxPage,
-				nextPage: linkNextPage,
-				prevPage: linkPreviousPage,
-				totalRecommend,
-				RecommendFollowList: listNotFriendWithUser,
-			};
-		} catch (error) {
-			throw new BadRequestError({
-				message: error,
-			});
-		}
 	};
 
 	static getAllNotify = async (req) => {
