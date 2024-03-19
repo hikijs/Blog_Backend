@@ -2,16 +2,16 @@ const { createClient } = require('redis');
 require('dotenv').config();
 
 // eslint-disable-next-line no-undef
-const { REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD } = process.env;
+const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env;
 
 const HOST = REDIS_HOST || '127.0.0.1';
 const PORT = REDIS_PORT || '6379';
-const USER = REDIS_USER || 'user';
 const PASSWORD = REDIS_PASSWORD || 'password';
 
 class RedisInstance {
 	constructor() {
-		this.redisUrl = `redis://${USER}:${PASSWORD}@${HOST}:${PORT}`;
+		this.redisUrl = `redis://:${PASSWORD}@${HOST}:${PORT}`;
+		console.log('Redis Url', this.redisUrl);
 	}
 
 	static getInstance() {

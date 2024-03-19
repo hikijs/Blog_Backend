@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
     app:
-        image: hunghoang149/blog:${BACKEND_VERSION}
+        build:
+            context: .
+            dockerfile: Dockerfile
         ports:
             - 3000:3000
         container_name: backend
@@ -11,6 +13,7 @@ services:
             - '/app/node_modules'
         depends_on:
             - mysql
+            - cache
         networks:
             blog_network:
                 aliases:
@@ -63,6 +66,20 @@ services:
                 aliases:
                     - utils
 
+    cache:
+        image: redis:6.2-alpine
+        container_name: cache
+        restart: always
+        ports:
+            - '6379:6379'
+        command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+        volumes: 
+           - cache:/data
+        networks:
+            blog_network:
+                aliases:
+                    - cache
+
 networks:
     blog_network:
         external: true
@@ -74,3 +91,9 @@ volumes:
             type: 'none'
             o: 'bind'
             device: './data'
+    cache:
+        driver: local
+        driver_opts:
+            type: 'none'
+            o: 'bind'
+            device: './cache'
